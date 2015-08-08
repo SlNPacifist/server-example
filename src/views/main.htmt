@@ -6,7 +6,8 @@
   </head>
   <body>
     {% for consumer in consumers %}
-        {{ consumer }}
+        <p>Id: {{ consumer.id }}
+        <p>Address: {{ consumer.address }}
     {% endfor %}
   </body>
 </html>

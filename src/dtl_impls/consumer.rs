@@ -1,6 +1,6 @@
 // Implementations needed for dtl
 
-use dtl::Value;
+use dtl::{Value, ValueAsString, ValueAsIterator, ValueAsObject, ValueAsBool, value_to_trait_object};
 use std::fmt;
 use models::Consumer;
 
@@ -13,10 +13,32 @@ impl Clone for Consumer {
     }
 }
 
-impl fmt::Display for Consumer {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Consumer (id: {}, address: {})", self.id, self.address)
+impl ValueAsString for Consumer {
+    fn as_string(&self) -> String {
+        format!("Consumer (id: {}, address: {})", self.id, self.address)
     }
+}
+
+impl ValueAsIterator for Consumer {
+	fn get_iterator(&self) -> Option<Box<Iterator<Item=&Value>>> {
+		None
+	}
+}
+
+impl ValueAsObject for Consumer {
+	fn get_property(&self, name: &str) -> Option<&Value> {
+		match name {
+			"id" => Some(&self.id),
+			"address" => Some(&self.address),
+			_ => None
+		}
+	}
+}
+
+impl ValueAsBool for Consumer {
+	fn as_bool(&self) -> bool {
+		true
+	}
 }
 
 impl fmt::Debug for Consumer {
@@ -25,22 +47,33 @@ impl fmt::Debug for Consumer {
     }
 }
 
-impl Value for Consumer {
-	fn get_children(&self) -> Vec<Box<Value>> {
-		Vec::new()
-	}
-}
-
-#[derive(Debug)]
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct ConsumerList {
 	consumers: Vec<Consumer>
 }
 
-impl fmt::Display for ConsumerList {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Consumer list ({} elements total)", self.consumers.len())
+impl ValueAsString for ConsumerList {
+    fn as_string(&self) -> String {
+        format!("Consumer list ({} elements total)", self.consumers.len())
     }
+}
+
+impl ValueAsIterator for ConsumerList {
+	fn get_iterator<'a>(&'a self) -> Option<Box<Iterator<Item=&Value> + 'a>> {
+		Some(Box::new(self.consumers.iter().map(value_to_trait_object)))
+	} 
+}
+
+impl ValueAsObject for ConsumerList {
+	fn get_property(&self, _: &str) -> Option<&Value> {
+		None
+	}
+}
+
+impl ValueAsBool for ConsumerList {
+	fn as_bool(&self) -> bool {
+		!self.consumers.is_empty()
+	}
 }
 
 impl From<Vec<Consumer>> for ConsumerList {
@@ -50,14 +83,3 @@ impl From<Vec<Consumer>> for ConsumerList {
 		}
 	}
 }
-
-fn box_consumer(c: &Consumer) -> Box<Value> {
-	Box::new(c.clone())
-}
-
-impl Value for ConsumerList {
-	fn get_children(&self) -> Vec<Box<Value>> {
-		self.consumers.iter().map(box_consumer).collect()
-	} 
-}
-
