@@ -1,17 +1,11 @@
-// Implementations needed for dtl
-
 use dtl::{Value, ValueAsString, ValueAsIterator, ValueAsObject, ValueAsBool, value_to_trait_object};
-use std::fmt;
 use models::Consumer;
 
-impl Clone for Consumer {
-    fn clone(&self) -> Consumer {
-        Consumer {
-            id: self.id,
-            address: self.address.clone()
-        }
-    }
+#[derive(Debug, Clone)]
+pub struct ConsumerList {
+	consumers: Vec<Consumer>
 }
+
 
 impl ValueAsString for Consumer {
     fn as_string(&self) -> String {
@@ -41,16 +35,6 @@ impl ValueAsBool for Consumer {
 	}
 }
 
-impl fmt::Debug for Consumer {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Consumer (id: {}, address: {})", self.id, self.address)
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct ConsumerList {
-	consumers: Vec<Consumer>
-}
 
 impl ValueAsString for ConsumerList {
     fn as_string(&self) -> String {

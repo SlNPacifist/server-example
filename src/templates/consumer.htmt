@@ -1,0 +1,14 @@
+{% extends "base.htmt" %}
+
+{% block title %}История платежей{% endblock %}
+
+{% block body %}
+	{% if consumer %}
+		<h1>История платежей для адреса {{consumer.address}}</h1>	
+		{% for payment in payments %}
+	        <p>Объем: {{ payment.volume }}
+	    {% endfor %}
+	{% else %}
+		Указанного пользователя не существует.
+	{% endif %}
+{% endblock %}

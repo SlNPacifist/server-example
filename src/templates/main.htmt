@@ -1,0 +1,10 @@
+{% extends "base.htmt" %}
+
+{% block title %}Consumers{% endblock %}
+
+{% block body %}
+	{% for consumer in consumers %}
+        <p>Id: {{ consumer.id }}
+        <p>Address: {{ consumer.address }}
+    {% endfor %}
+{% endblock %}
