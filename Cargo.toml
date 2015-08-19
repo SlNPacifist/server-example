@@ -6,6 +6,8 @@ authors = [ "Your name <you@example.com>" ]
 [dependencies]
 iron = "*"
 router = "*"
+mount = { git = "https://github.com/iron/mount.git", version = "0.0.7" }
+staticfile = "*"
 postgres = {version = "0.9.3", features = ["chrono"] }
 r2d2 = "0.6.0"
 r2d2_postgres = "0.9.2"
