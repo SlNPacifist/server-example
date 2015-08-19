@@ -24,6 +24,7 @@ impl ValueAsObject for VolumePayment {
 		match name {
 			"id" => Some(&self.id),
 			"volume" => Some(&self.volume),
+			"payment_time" => Some(&self.payment_time),
 			"consumer_id" => Some(&self.consumer_id),
 			_ => None
 		}
@@ -43,7 +44,7 @@ impl ValueAsString for VolumePaymentList {
 }
 
 impl ValueAsIterator for VolumePaymentList {
-	fn get_iterator<'a>(&'a self) -> Option<Box<Iterator<Item=&Value> + 'a>> {
+	fn get_iterator<'b>(&'b self) -> Option<Box<Iterator<Item=&Value> + 'b>> {
 		Some(Box::new(self.payments.iter().map(value_to_trait_object)))
 	} 
 }
@@ -60,8 +61,8 @@ impl ValueAsBool for VolumePaymentList {
 	}
 }
 
-impl From<Vec<VolumePayment>> for VolumePaymentList {
-	fn from(v: Vec<VolumePayment>) -> VolumePaymentList {
+impl VolumePaymentList {
+	pub fn new(v: Vec<VolumePayment>) -> VolumePaymentList {
 		VolumePaymentList {
 			payments: v
 		}

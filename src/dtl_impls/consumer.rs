@@ -9,7 +9,7 @@ pub struct ConsumerList {
 
 impl ValueAsString for Consumer {
     fn as_string(&self) -> String {
-        format!("Consumer (id: {}, address: {})", self.id, self.address)
+        format!("{:?}", self)
     }
 }
 

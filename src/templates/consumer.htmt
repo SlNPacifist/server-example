@@ -7,6 +7,7 @@
 		<h1>История платежей для адреса {{consumer.address}}</h1>	
 		{% for payment in payments %}
 	        <p>Объем: {{ payment.volume }}
+	        <p>Дата: {{ payment.payment_time|chrono_format:%d.%m.%Y }}
 	    {% endfor %}
 	{% else %}
 		Указанного пользователя не существует.

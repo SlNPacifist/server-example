@@ -5,6 +5,7 @@ extern crate dtl;
 extern crate postgres;
 extern crate r2d2;
 extern crate r2d2_postgres;
+extern crate chrono;
 
 mod models;
 mod views;
