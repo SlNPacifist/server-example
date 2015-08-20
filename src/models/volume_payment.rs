@@ -21,7 +21,6 @@ impl VolumePayment {
                 consumer_id: consumer_id,
             });
     	}
-        println!("{:?}", res);
         res
     }
 }
