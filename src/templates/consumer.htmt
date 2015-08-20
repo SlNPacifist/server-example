@@ -1,14 +1,29 @@
 {% extends "base.htmt" %}
 
-{% block title %}История платежей{% endblock %}
+{% block title %} - история платежей{% endblock %}
 
 {% block body %}
 	{% if consumer %}
-		<h1>История платежей для адреса {{consumer.address}}</h1>	
-		{% for payment in payments %}
-	        <p>Объем: {{ payment.volume }}
-	        <p>Дата: {{ payment.payment_time|chrono_format:%d.%m.%Y }}
-	    {% endfor %}
+		<h1>История платежей для адреса {{consumer.address}}</h1>
+		{% if payments %}
+			<table>
+				<thead>
+					<tr>
+						<th>Дата</th>
+						<th>Объем</th>
+					</tr>
+				</thead>
+				<tbody>
+				{% for payment in payments %}
+					<tr>
+			        	<td>{{ payment.payment_time|chrono_format:%d.%m.%Y }}</td>
+			        	<td>{{ payment.volume }} м<sup>3</sup></td>
+			        </tr>
+			    {% endfor %}
+		    </table>
+	    {% else %}
+	    	Нет ни одного платежа
+	    {% endif %}
 	{% else %}
 		Указанного пользователя не существует.
 	{% endif %}
