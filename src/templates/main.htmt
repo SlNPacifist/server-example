@@ -1,10 +1,10 @@
 {% extends "base.htmt" %}
 
-{% block title %}Consumers{% endblock %}
-
 {% block body %}
+	<h1>Список потребителей:</h1>
+	<ul>
 	{% for consumer in consumers %}
-        <p>Id: {{ consumer.id }}
-        <p>Address: {{ consumer.address }}
+		<li><a href="/consumer/{{consumer.id}}/">{{ consumer.address }}</a>
     {% endfor %}
+    </ul>
 {% endblock %}
