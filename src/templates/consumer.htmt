@@ -20,10 +20,15 @@
 			        	<td>{{ payment.volume }} м<sup>3</sup></td>
 			        </tr>
 			    {% endfor %}
+			    <tr>
+			    	<td>Итого</td>
+			    	<td>{{ total_volume_sum }} м<sup>3</td>
+			    </tr>
 		    </table>
 	    {% else %}
-	    	Нет ни одного платежа
+	    	<p>Нет ни одного платежа</p>
 	    {% endif %}
+	    <p><a href="add_payment/">Добавить платеж</a></p>
 	{% else %}
 		Указанного пользователя не существует.
 	{% endif %}
