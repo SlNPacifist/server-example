@@ -1,21 +1,18 @@
 mod main;
 mod consumer;
+mod static_files;
 
-use db::{DbConnectionPool, Database};
 use iron::prelude::*;
-use router::Router;
 use persistent::Read;
-use mount::Mount;
-use staticfile::Static;
-use std::path::Path;
+use router::Router;
+use db::{DbConnectionPool, Database};
+
 
 pub fn get_root(pool: DbConnectionPool) -> Chain {
 	let mut router = Router::new();
-	router.get("/", main::entry);
+	main::append_entry(&mut router);
 	consumer::append_entry(&mut router);
-	let mut mounter = Mount::new();
-	mounter.mount("/s/", Static::new(Path::new("/home/slnpacifist/eclipse_workspace/shop/src/static")));
-	router.get("/s/*", mounter);
+	static_files::append_entry(&mut router);
 	let mut chain = Chain::new(router);
 	chain.link_before(Read::<Database>::one(pool));
 	chain

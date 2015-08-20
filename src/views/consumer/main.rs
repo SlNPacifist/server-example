@@ -1,12 +1,12 @@
+use std::path::{Path, PathBuf};
 use iron::prelude::*;
 use iron::status;
 use iron::headers::*;
 use persistent::Read;
+use dtl::{Context, HashMapContext, TemplateCompiler};
 use db::Database;
 use models::VolumePayment;
 use dtl_impls::VolumePaymentList;
-use dtl::{Context, HashMapContext, TemplateCompiler};
-use std::path::{Path, PathBuf};
 use super::ConsumerHandler;
 
 

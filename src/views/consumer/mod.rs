@@ -11,6 +11,7 @@ use models::Consumer;
 use db::Database;
 use self::main::entry;
 
+
 pub fn append_entry(router: &mut Router) {
 	let mut entry = Chain::new(main::entry);
 	entry.around(ConsumerPreprocessor);

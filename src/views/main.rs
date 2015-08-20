@@ -1,14 +1,16 @@
+use std::path::{Path, PathBuf};
 use iron::prelude::*;
 use iron::status;
 use iron::headers::*;
 use persistent::Read;
-use db::Database;
+use router::Router;
+use dtl::{Context, HashMapContext, TemplateCompiler};
 use models::Consumer;
 use dtl_impls::ConsumerList;
-use dtl::{Context, HashMapContext, TemplateCompiler};
-use std::path::{Path, PathBuf};
+use db::Database;
 
-pub fn entry(req: &mut Request) -> IronResult<Response> {
+
+fn entry(req: &mut Request) -> IronResult<Response> {
 	let pool = req.get::<Read<Database>>().unwrap();
 	let consumers = Consumer::all(&pool.get().unwrap());
     let mut ctx = HashMapContext::new();
@@ -20,4 +22,8 @@ pub fn entry(req: &mut Request) -> IronResult<Response> {
     let mut res = Response::with((status::Ok, response_text));
     res.headers.set(ContentType::html());
     Ok(res)
+}
+
+pub fn append_entry(router: &mut Router) {
+	router.get("/", entry);
 }
