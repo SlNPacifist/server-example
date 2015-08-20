@@ -17,5 +17,6 @@ mod dtl_impls;
 fn main() {
 	let pool = db::get_db_connection_pool();
 	let root = views::get_root(pool);
+	println!("Server started");
     iron::Iron::new(root).http("localhost:3000").unwrap();
 }
