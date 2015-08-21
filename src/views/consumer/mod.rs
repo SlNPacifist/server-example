@@ -9,13 +9,15 @@ use router::Router;
 use persistent::Read;
 use models::Consumer;
 use db::Database;
-use self::main::entry;
 
 
 pub fn append_entry(router: &mut Router) {
-	let mut entry = Chain::new(main::entry);
-	entry.around(ConsumerPreprocessor);
-	router.get("/consumer/:id/", entry);
+	let mut get_entry = Chain::new(self::main::entry);
+	get_entry.around(ConsumerPreprocessor);
+	router.get("/consumer/:id/", get_entry);
+	let mut post_entry = Chain::new(self::main::add_payment);
+	post_entry.around(ConsumerPreprocessor);
+	router.post("/consumer/:id/add_payment", post_entry);
 }
 
 struct ConsumerHandler {

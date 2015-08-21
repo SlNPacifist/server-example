@@ -3,33 +3,46 @@
 {% block title %} - история платежей{% endblock %}
 
 {% block body %}
-	{% if consumer %}
-		<h1>История платежей для адреса {{consumer.address}}</h1>
-		{% if payments %}
-			<table>
-				<thead>
-					<tr>
-						<th>Дата</th>
-						<th>Объем</th>
-					</tr>
-				</thead>
-				<tbody>
-				{% for payment in payments %}
-					<tr>
-			        	<td>{{ payment.payment_time|chrono_format:%d.%m.%Y }}</td>
-			        	<td>{{ payment.volume }} м<sup>3</sup></td>
-			        </tr>
-			    {% endfor %}
-			    <tr>
-			    	<td>Итого</td>
-			    	<td>{{ total_volume_sum }} м<sup>3</td>
-			    </tr>
-		    </table>
-	    {% else %}
-	    	<p>Нет ни одного платежа</p>
-	    {% endif %}
-	    <p><a href="add_payment/">Добавить платеж</a></p>
-	{% else %}
-		Указанного пользователя не существует.
-	{% endif %}
+	<h1>История платежей для адреса {{consumer.address}}</h1>
+	{% if payments %}
+		<table>
+			<thead>
+				<tr>
+					<th>Дата</th>
+					<th>Объем</th>
+				</tr>
+			</thead>
+			<tbody>
+			{% for payment in payments %}
+				<tr>
+		        	<td>{{ payment.payment_time|chrono_format:%d.%m.%Y }}</td>
+		        	<td>{{ payment.volume }} м<sup>3</sup></td>
+		        </tr>
+		    {% endfor %}
+		    <tr>
+		    	<td>Итого</td>
+		    	<td>{{ total_volume_sum }} м<sup>3</td>
+		    </tr>
+	    </table>
+    {% else %}
+    	<p>Нет ни одного платежа</p>
+    {% endif %}
+    <h1>Добавить платеж</h1>
+    <form action="add_payment" method="POST">
+    	<table>
+    		<tr>
+    			<td>Объем</td>
+    			<td><input type="text" name="volume"></td>
+			</tr>
+			<tr>
+				<td>Сумма</td>
+				<td><input type="text" name="payment_sum"></td>
+			</tr>
+			<tr>
+				<td>Дата</td>
+				<td><input type="date" value="{{today|chrono_format:%Y-%m-%d}}" name="payment_date"></td>
+			</tr>
+    	</table>
+    	<input type="submit" value="Добавить платеж">
+    </form>
 {% endblock %}
