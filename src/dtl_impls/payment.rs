@@ -24,7 +24,7 @@ impl ValueAsObject for VolumePayment {
 		match name {
 			"id" => Some(&self.id),
 			"volume" => Some(&self.volume),
-			"payment_time" => Some(&self.payment_time),
+			"payment_date" => Some(&self.payment_date),
 			"consumer_id" => Some(&self.consumer_id),
 			_ => None
 		}

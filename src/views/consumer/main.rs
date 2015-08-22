@@ -37,9 +37,24 @@ pub fn entry(req: &mut Request) -> IronResult<Response> {
 }
 
 pub fn add_payment(req: &mut Request) -> IronResult<Response> {
-	let form = AddPaymentForm::new(req.get::<UrlEncodedBody>().unwrap());
-	println!("{:?}", form);
-	Ok(Response::with(status::Ok))
+	let form_opt = AddPaymentForm::new(&req.get::<UrlEncodedBody>().unwrap());
+	let connection = req.get::<Read<Database>>().unwrap().get().unwrap();
+    let consumer = req.extensions.get::<ConsumerHandler>().unwrap();
+	match form_opt {
+		Ok(form) => {
+			VolumePayment::insert(&connection, form.volume, consumer.id, form.payment_date, form.payment_sum);
+			let mut res = Response::with(status::SeeOther);
+		    let location = Location(format!("/consumer/{}/?payment_added", consumer.id));
+			res.headers.set(location);
+			Ok(res)
+		}
+		Err(_) => {
+			let mut res = Response::with(status::SeeOther);
+		    let location = Location(format!("/consumer/{}/?payment_not_added", consumer.id));
+			res.headers.set(location);
+			Ok(res)
+		}
+	}
 }
 
 #[derive(Debug, Clone)]
@@ -94,7 +109,7 @@ impl AddPaymentForm {
 			))
 		}
 	}
-	pub fn new(source: QueryMap) -> Result<AddPaymentForm> {
+	pub fn new(source: &QueryMap) -> Result<AddPaymentForm> {
 		Ok(AddPaymentForm {
 			volume: try!(Self::get_volume(source.get("volume"))),
 			payment_sum: try!(Self::get_payment_sum(source.get("payment_sum"))),
