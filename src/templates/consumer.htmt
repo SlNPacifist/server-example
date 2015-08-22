@@ -5,7 +5,7 @@
 {% block body %}
 	<h1>История платежей для адреса {{consumer.address}}</h1>
 	{% if payments %}
-		<table>
+		<table class="table table-striped">
 			<thead>
 				<tr>
 					<th>Дата</th>
@@ -15,7 +15,7 @@
 			<tbody>
 			{% for payment in payments %}
 				<tr>
-		        	<td>{{ payment.payment_time|chrono_format:%d.%m.%Y }}</td>
+		        	<td>{{ payment.payment_date|chrono_format:%d.%m.%Y }}</td>
 		        	<td>{{ payment.volume }} м<sup>3</sup></td>
 		        </tr>
 		    {% endfor %}
@@ -27,22 +27,33 @@
     {% else %}
     	<p>Нет ни одного платежа</p>
     {% endif %}
-    <h1>Добавить платеж</h1>
-    <form action="add_payment" method="POST">
-    	<table>
-    		<tr>
-    			<td>Объем</td>
-    			<td><input type="text" name="volume"></td>
-			</tr>
-			<tr>
-				<td>Сумма</td>
-				<td><input type="text" name="payment_sum"></td>
-			</tr>
-			<tr>
-				<td>Дата</td>
-				<td><input type="date" value="{{today|chrono_format:%Y-%m-%d}}" name="payment_date"></td>
-			</tr>
-    	</table>
-    	<input type="submit" value="Добавить платеж">
+    {# <h1>Добавить платеж</h1> #}
+    <form class="form-horizontal" action="add_payment" method="POST">
+    <fieldset>
+    	<legend>Добавить платеж</legend>
+    	<div class="form-group">
+  			<label class="control-label col-md-4" for="volume_field">Объем</label>  
+			<div class="col-md-4">
+		    	<input id="volume_field" name="volume" type="text" class="form-control input-md">
+		    </div>
+		</div>
+    	<div class="form-group">
+  			<label class="col-md-4 control-label" for="payment_sum_field">Сумма</label>  
+			<div class="col-md-4">
+		    	<input id="payment_sum_field" name="payment_sum" type="text" class="form-control input-md">
+		    </div>
+		</div>
+    	<div class="form-group">
+  			<label class="col-md-4 control-label" for="payment_date_field">Дата</label>  
+			<div class="col-md-4">
+		    	<input id="payment_date_field" name="payment_date" type="date" value="{{today|chrono_format:%Y-%m-%d}}" class="form-control input-md">
+		    </div>
+		</div>
+		<div class="form-group">
+		  	<div class="col-md-4">
+		  		<input type="submit" value="Добавить платеж" class="btn btn-primary">
+		  	</div>
+		</div>
+	</fieldset>
     </form>
 {% endblock %}
