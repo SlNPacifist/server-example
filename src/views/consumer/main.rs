@@ -1,6 +1,5 @@
 use std::path::Path;
 use std::io::{Result, Error, ErrorKind};
-use std::str::FromStr;
 use iron::prelude::*;
 use iron::status;
 use iron::headers::*;
@@ -14,6 +13,7 @@ use models::VolumePayment;
 use dtl_impls::VolumePaymentList;
 use super::ConsumerHandler;
 use views::TemplateCompilerKey;
+use forms::*;
 
 
 pub fn entry(req: &mut Request) -> IronResult<Response> {
@@ -65,26 +65,8 @@ struct AddPaymentForm {
 }
 
 impl AddPaymentForm {
-	fn parse_single_field<'a>(source: Option<&'a Vec<String>>, field_name: &str) -> Result<&'a str> {
-		match source {
-			Some(strings) => {
-				match strings.len() {
-					1 => Ok(&strings[0]),
-					0 => Err(Error::new(ErrorKind::InvalidInput, format!("{} field in add payment form is empty", field_name))),
-					_ => Err(Error::new(ErrorKind::InvalidInput, format!("Not single value for {} field in add payment form", field_name)))
-				}
-			},
-			None => Err(Error::new(ErrorKind::InvalidInput, format!("No {} field in add payment form", field_name)))
-		}
-	}
-	fn parse_single_f32(source: Option<&Vec<String>>, field_name: &str) -> Result<f32> {
-		match f32::from_str(try!(Self::parse_single_field(source, field_name))) {
-			Ok(val) => Ok(val),
-			Err(reason) => Err(Error::new(ErrorKind::InvalidInput, format!("Could not parse {} field: {}", field_name, reason))),
-		}
-	}
 	fn get_volume(source: Option<&Vec<String>>) -> Result<f32> {
-		let volume = try!(Self::parse_single_f32(source, "volume"));
+		let volume = try!(parse_single_f32(source, "volume"));
 		if volume <= 1e-6 {
 			Err(Error::new(ErrorKind::InvalidInput, format!("volume field in add payment form is too small: {}", volume)))
 		} else {
@@ -92,7 +74,7 @@ impl AddPaymentForm {
 		}
 	}
 	fn get_payment_sum(source: Option<&Vec<String>>) -> Result<f32> {
-		let sum = try!(Self::parse_single_f32(source, "payment_sum"));
+		let sum = try!(parse_single_f32(source, "payment_sum"));
 		if sum < 0.0 {
 			Err(Error::new(ErrorKind::InvalidInput, format!("payment_sum field in add payment form is too small: {}", sum)))
 		} else {
@@ -100,7 +82,7 @@ impl AddPaymentForm {
 		}
 	}
 	fn get_payment_date(source: Option<&Vec<String>>) -> Result<NaiveDate> {
-		let source_string = try!(Self::parse_single_field(source, "payment_date"));
+		let source_string = try!(parse_single_field(source, "payment_date"));
 		match NaiveDate::parse_from_str(&source_string, "%Y-%m-%d") {
 			Ok(res) => Ok(res),
 			Err(err) => Err(Error::new(

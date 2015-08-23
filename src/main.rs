@@ -14,6 +14,7 @@ mod models;
 mod views;
 mod db;
 mod dtl_impls;
+mod forms;
 
 fn main() {
 	let pool = db::get_db_connection_pool();

@@ -1,0 +1,52 @@
+{% extends "base.htmt" %}
+
+{% block title %} - список пользователей{% endblock %}
+
+{% block body %}
+    <form class="form-horizontal" action="add_user/" method="POST">
+    <fieldset>
+    	<legend>Добавить пользователя</legend>
+    	<div class="form-group">
+  			<label class="control-label col-md-4" for="login_field">Логин</label>  
+			<div class="col-md-4">
+		    	<input id="login_field" name="login" type="text" class="form-control input-md">
+		    </div>
+		</div>
+    	<div class="form-group">
+  			<label class="col-md-4 control-label" for="password_field">Пароль</label>  
+			<div class="col-md-4">
+		    	<input id="password_field" name="password" type="password" class="form-control input-md">
+		    </div>
+		</div>
+    	<div class="form-group">
+  			<label class="col-md-4 control-label" for="role">Права</label>  
+			<div class="col-md-4">
+				<label class="radio-inline" for="is_admin_field">
+	    			<input type="radio" id="is_admin_field" name="role" value="0">
+	    			Администратор
+	    		</label>
+				<label class="radio-inline" for="is_user_field">
+	    			<input type="radio" id="is_user_field" name="role" value="1" checked>
+	    			Пользователь
+	    		</label>
+		    </div>
+		</div>
+		<div class="form-group">
+		  	<label class="col-md-4 control-label" for="consumer_id_field">Select Basic</label>
+		  	<div class="col-md-4">
+		    	<select id="consumer_id_field" name="consumer_id" class="form-control">
+		      		<option value="-1">Не является потребителем</option>
+		      		{% for consumer in consumers %}
+		      		<option value="{{consumer.id}}">{{consumer.address}}</option>
+		      		{% endfor %}
+		    	</select>
+		  	</div>
+		</div>
+		<div class="form-group">
+		  	<div class="col-md-4">
+		  		<input type="submit" value="Добавить пользователя" class="btn btn-primary">
+		  	</div>
+		</div>
+	</fieldset>
+    </form>
+{% endblock %}
