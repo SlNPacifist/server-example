@@ -1,6 +1,7 @@
 mod main;
 mod admin;
 mod consumer;
+mod login;
 mod static_files;
 
 use std::path::PathBuf;
@@ -21,6 +22,7 @@ pub fn get_root(pool: DbConnectionPool) -> Chain {
 	main::append_entry(&mut router);
 	consumer::append_entry(&mut router);
 	admin::append_entry(&mut router);
+	login::append_entry(&mut router);
 	static_files::append_entry(&mut router);
     let mut root = PathBuf::new();
     root.push("/home/slnpacifist/eclipse_workspace/shop/src/templates");

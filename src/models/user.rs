@@ -2,6 +2,7 @@ extern crate r2d2;
 extern crate r2d2_postgres;
 extern crate dtl;
 
+use std;
 use postgres::Result;
 use super::{Connection, Consumer};
 
@@ -18,6 +19,14 @@ impl UserRole {
 			&UserRole::User => 1,
 		}
 	}
+	
+	fn from_id(id: i32) -> std::result::Result<UserRole, String> {
+		match id {
+			0 => Ok(UserRole::Admin),
+			1 => Ok(UserRole::User),
+			_ => Err(format!("No role with id {} found", id)),
+		}
+	}
 }
 
 #[derive(Clone, Debug)]
@@ -29,19 +38,24 @@ pub struct User {
 }
 
 impl User {
-//	pub fn by_login(c: &Connection, login: &str) -> Option<User> {
-//        let stmt = c.prepare("SELECT user FROM user where id = $1").unwrap();
-//        match stmt.query(&[&id]).unwrap().iter().next() {
-//        	Some(row) => Some(Consumer { id: id, address: row.get(0) }),
-//        	None => None
-//        }
-//	}
-	
 	pub fn create(c: &Connection, login: String, password: String, role: UserRole, consumer_id: Option<i32>) -> Result<u64> {
 		c.execute(
 			"INSERT INTO \"user\" (login, password, role, consumer_id) VALUES ($1, crypt($2, gen_salt('bf', 8)), $3, $4)",
 			&[&login, &password, &role.get_id(), &consumer_id]
 		)
+	}
+	
+	pub fn by_login_and_password(c: &Connection, login: String, password: String) -> Option<User> {
+        let stmt = c.prepare("SELECT login, role, consumer_id FROM \"user\" WHERE login = $1 AND password = crypt($2, password);").unwrap();
+        match stmt.query(&[&login, &password]).unwrap().iter().next() {
+        	Some(row) => Some(User {
+    			login: row.get(0),
+    			role: UserRole::from_id(row.get(1)).unwrap(),
+    			consumer_id: row.get(2),
+    			consumer: None,
+			}),
+        	None => None
+        }
 	}
 	
 	pub fn all(c: &Connection) -> Vec<User> {
