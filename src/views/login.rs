@@ -3,14 +3,15 @@ use std::io::{Result, Error, ErrorKind};
 use iron::prelude::*;
 use iron::status;
 use iron::headers::*;
-use persistent::Read;
+use persistent::{Read, State};
 use router::Router;
 use dtl::{Context, HashMapContext};
 use urlencoded::{QueryMap, UrlEncodedBody};
 use models::User;
 use db::Database;
-use views::TemplateCompilerKey;
+use views::{TemplateCompilerKey, SessionStorageKey};
 use forms::*;
+use session::{Session, SessionStorage};
 
 
 fn entry(req: &mut Request) -> IronResult<Response> {
@@ -28,7 +29,14 @@ pub fn login_user(req: &mut Request) -> IronResult<Response> {
 		Ok(form) => {
 			let connection = req.get::<Read<Database>>().unwrap().get().unwrap();
 			match User::by_login_and_password(&connection, form.login, form.password) {
-				Some(_) => Location("/".to_string()),
+				Some(user) => {
+					let session = Session::new(user);
+					let arc_session_storage = req.get::<State<SessionStorageKey>>().unwrap();
+					let mut session_storage = arc_session_storage.write().unwrap();
+					(*session_storage).insert(session);
+					println!("{:?}", *session_storage);
+					Location("/".to_string())
+				}
 				None => {
 					Location("?user_not_logged_in".to_string())
 				}
