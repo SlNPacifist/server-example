@@ -40,7 +40,6 @@ pub fn login_user(req: &mut Request) -> IronResult<Response> {
 						let arc_session_storage = req.get::<State<SessionStorageKey>>().unwrap();
 						let mut session_storage = arc_session_storage.write().unwrap();
 						(*session_storage).insert(session);
-						println!("{:?}", *session_storage);
 					}
 					Location("/".to_string())
 				}
