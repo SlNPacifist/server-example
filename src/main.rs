@@ -3,6 +3,7 @@ extern crate persistent;
 extern crate mount;
 extern crate router;
 extern crate staticfile;
+extern crate oatmeal_raisin;
 extern crate dtl;
 extern crate postgres;
 extern crate r2d2;

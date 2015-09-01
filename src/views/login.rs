@@ -5,6 +5,7 @@ use iron::status;
 use iron::headers::*;
 use persistent::{Read, State};
 use router::Router;
+use oatmeal_raisin as or;
 use dtl::{Context, HashMapContext};
 use urlencoded::{QueryMap, UrlEncodedBody};
 use models::User;
@@ -31,10 +32,16 @@ pub fn login_user(req: &mut Request) -> IronResult<Response> {
 			match User::by_login_and_password(&connection, form.login, form.password) {
 				Some(user) => {
 					let session = Session::new(user);
-					let arc_session_storage = req.get::<State<SessionStorageKey>>().unwrap();
-					let mut session_storage = arc_session_storage.write().unwrap();
-					(*session_storage).insert(session);
-					println!("{:?}", *session_storage);
+					{
+						let jar = req.get_mut::<or::CookieJar>().unwrap();
+						jar.add(or::Cookie::new("session-id".into(), session.id.clone().into()));
+					}
+					{
+						let arc_session_storage = req.get::<State<SessionStorageKey>>().unwrap();
+						let mut session_storage = arc_session_storage.write().unwrap();
+						(*session_storage).insert(session);
+						println!("{:?}", *session_storage);
+					}
 					Location("/".to_string())
 				}
 				None => {
@@ -80,5 +87,7 @@ impl UserLoginForm {
 
 pub fn append_entry(router: &mut Router) {
 	router.get("/login/", entry);
-	router.post("/login/", login_user);
+	let mut chain = Chain::new(login_user);
+	chain.link_after(or::SetCookie);
+	router.post("/login/", chain);
 }
