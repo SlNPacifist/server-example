@@ -4,6 +4,7 @@ version = "0.0.1"
 authors = [ "Your name <you@example.com>" ]
 
 [dependencies]
+rand = "0.3"
 iron = "*"
 router = "*"
 mount = { git = "https://github.com/iron/mount.git", version = "0.0.7" }

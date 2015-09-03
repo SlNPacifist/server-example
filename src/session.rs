@@ -1,5 +1,8 @@
 use std::collections::HashMap;
 use models::User;
+use rand::{self, Rng};
+
+const SESSION_ID_LENGTH: usize = 32;
 
 #[derive(Debug, Clone)]
 pub struct Session {
@@ -8,9 +11,13 @@ pub struct Session {
 }
 
 impl Session {
+	fn generate_id() -> String {
+		rand::OsRng::new().unwrap().gen_ascii_chars().take(SESSION_ID_LENGTH).collect()
+	}
+	
 	pub fn new(user: User) -> Session {
 		Session {
-			id: "abc".to_string(),
+			id: Self::generate_id(),
 			user: user
 		}
 	}

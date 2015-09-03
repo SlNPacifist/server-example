@@ -1,3 +1,4 @@
+extern crate rand;
 extern crate iron;
 extern crate persistent;
 extern crate mount;
