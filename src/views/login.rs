@@ -7,7 +7,7 @@ use persistent::{Read, State};
 use router::Router;
 use oatmeal_raisin as or;
 use dtl::{Context, HashMapContext};
-use urlencoded::{QueryMap, UrlEncodedBody};
+use urlencoded::{QueryMap, UrlEncodedBody, UrlEncodedQuery};
 use models::User;
 use db::Database;
 use views::{TemplateCompilerKey, SessionStorageKey};
@@ -17,9 +17,26 @@ use session::{Session, SessionStorage};
 
 fn entry(req: &mut Request) -> IronResult<Response> {
 	let template_compiler = req.get::<Read<TemplateCompilerKey>>().unwrap();
-    let ctx = HashMapContext::new();
+    let mut ctx = HashMapContext::new();
+	let res_status = {
+		match req.get_ref::<UrlEncodedQuery>() {
+			Ok(url_query) => {
+				if let Ok(next_url) = parse_single_field(url_query.get("next"), "") {
+					ctx.set("next", Box::new(next_url.to_string()));
+				}
+				match parse_single_field(url_query.get("reason"), "") {
+					Ok("forbidden") => {
+						ctx.set("is_forbidden", Box::new(true));
+						status::Forbidden
+					}
+					_ => status::Ok,
+				}
+			},
+			_ => status::Ok,
+		}
+	};
     let response_text = template_compiler.render(Path::new("login.htmt"), &ctx).unwrap();
-    let mut res = Response::with((status::Ok, response_text));
+    let mut res = Response::with((res_status, response_text));
     res.headers.set(ContentType::html());
     Ok(res)
 }
@@ -41,7 +58,7 @@ pub fn login_user(req: &mut Request) -> IronResult<Response> {
 						let mut session_storage = arc_session_storage.write().unwrap();
 						session_storage.insert(session);
 					}
-					Location("/".to_string())
+					Location(form.next.unwrap_or("/".to_string()))
 				}
 				None => {
 					Location("?user_not_logged_in".to_string())
@@ -61,6 +78,7 @@ pub fn login_user(req: &mut Request) -> IronResult<Response> {
 struct UserLoginForm {
 	login: String,
 	password: String,
+	next: Option<String>,
 }
 
 impl UserLoginForm {
@@ -76,10 +94,17 @@ impl UserLoginForm {
 		let password = try!(parse_single_field(source, "password"));
 		Ok(password.to_string())
 	}
+	fn get_next(source: Option<&Vec<String>>) -> Option<String> {
+		match parse_single_field(source, "next") {
+			Ok(next) => Some(next.to_string()),
+			_ => None,
+		}
+	}
 	pub fn new(source: &QueryMap) -> Result<Self> {
 		Ok(UserLoginForm {
 			login: try!(Self::get_login(source.get("login"))),
 			password: try!(Self::get_password(source.get("password"))),
+			next: Self::get_next(source.get("next")),
 		})
 	}
 }

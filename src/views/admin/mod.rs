@@ -1,6 +1,7 @@
 mod main;
 
 use iron::prelude::*;
+use iron::headers::*;
 use iron::middleware::{Handler, AroundMiddleware};
 use iron::status;
 use iron::typemap::Key;
@@ -61,7 +62,9 @@ impl Handler for AdminHandler {
 				_ => {}
 			}
 		}
-		Ok(Response::with(status::NotFound))
+		let mut res = Response::with(status::SeeOther);
+		res.headers.set(Location(format!("/login/?reason=forbidden&next={}", req.url)));
+		Ok(res)
 	}
 }
 

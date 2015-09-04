@@ -2,6 +2,9 @@
 
 {% block body %}
 	<h1>Вход в систему</h1>
+	{% if is_forbidden %}
+	<div class="alert alert-warning" role="alert">Для доступа к запрашиваемой странице необходимы соответствующие права</div>
+	{% endif %}
     <form class="form-horizontal" action="" method="POST">
     <fieldset>
     	<div class="form-group">
@@ -21,6 +24,9 @@
 		  		<input type="submit" value="Войти" class="btn btn-primary">
 		  	</div>
 		</div>
+		{% if next %}
+		<input name="next" type="hidden" value="{{next}}">
+		{% endif %}
 	</fieldset>
     </form>
 {% endblock %}
