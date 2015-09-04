@@ -58,7 +58,15 @@ pub fn login_user(req: &mut Request) -> IronResult<Response> {
 						let mut session_storage = arc_session_storage.write().unwrap();
 						session_storage.insert(session);
 					}
-					Location(form.next.unwrap_or("/".to_string()))
+					let is_sanitized = match form.next {
+						Some(ref url) if url.starts_with("//") => false,
+						Some(ref url) if url.starts_with("/") => true,
+						_ => false
+					};
+					Location(match is_sanitized {
+						true => form.next.unwrap(),
+						false => "/".to_string()
+					})
 				}
 				None => {
 					Location("?user_not_logged_in".to_string())
