@@ -4,13 +4,8 @@ use iron::prelude::*;
 use iron::headers::*;
 use iron::middleware::{Handler, AroundMiddleware};
 use iron::status;
-use iron::typemap::Key;
 use router::Router;
-use oatmeal_raisin as or;
-use persistent::State;
-use models::{User, UserRole};
-use views::SessionStorageKey;
-use session::SessionStorage;
+use session::CurrentSession;
 
 
 pub fn append_entry(router: &mut Router) {
@@ -26,44 +21,15 @@ struct AdminHandler {
 	org: Box<Handler>
 }
 
-impl AdminHandler {
-	fn get_user(req: &mut Request) -> Option<User> {
-		let opt_session_id = {
-			let jar = req.get_mut::<or::CookieJar>().unwrap();
-			match jar.find("session-id") {
-				Some(cookie) => Some(cookie.value.clone()),
-				None => None
-			}
-		};
-		match opt_session_id {
-			Some(session_id) => {
-				let arc_session_storage = req.get::<State<SessionStorageKey>>().unwrap();
-				let session_storage = arc_session_storage.read().unwrap();
-				match session_storage.by_id(&session_id) {
-					Some(session) => Some(session.user.clone()),
-					None => None
-				}
-			}
-			None => None
-		}
-	}
-}
-
-impl Key for AdminHandler { type Value = User; }
-
 impl Handler for AdminHandler {
 	fn handle(&self, req: &mut Request) -> IronResult<Response> {
-		if let Some(user) = Self::get_user(req) {
-			match user.role {
-				UserRole::Admin => {
-					req.extensions.insert::<AdminHandler>(user);
-					return self.org.handle(req);
-				},
-				_ => {}
+		if let Ok(session) = req.get::<CurrentSession>() {
+			if session.user.role.is_admin() {
+				return self.org.handle(req);
 			}
 		}
 		let mut res = Response::with(status::SeeOther);
-		res.headers.set(Location(format!("/login/?reason=forbidden&next={}", req.url)));
+		res.headers.set(Location(format!("/login/?reason=forbidden&next=/{}", req.url.path.join("/"))));
 		Ok(res)
 	}
 }

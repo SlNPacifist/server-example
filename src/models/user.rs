@@ -27,6 +27,13 @@ impl UserRole {
 			_ => Err(format!("No role with id {} found", id)),
 		}
 	}
+	
+	pub fn is_admin(&self) -> bool {
+		match self {
+			&UserRole::Admin => true,
+			_ => false
+		}
+	}
 }
 
 #[derive(Clone, Debug)]

@@ -7,6 +7,7 @@ authors = [ "Your name <you@example.com>" ]
 rand = "0.3"
 iron = "*"
 router = "*"
+plugin = "0.2"
 mount = { git = "https://github.com/iron/mount.git", version = "0.0.7" }
 persistent = { git = "https://github.com/iron/persistent.git" }
 staticfile = "*"

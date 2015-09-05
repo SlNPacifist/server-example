@@ -1,3 +1,7 @@
+mod plugins;
+
+pub use self::plugins::CurrentSession;
+
 use std::collections::HashMap;
 use models::User;
 use rand::{self, Rng};

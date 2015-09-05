@@ -5,6 +5,7 @@ extern crate mount;
 extern crate router;
 extern crate staticfile;
 extern crate oatmeal_raisin;
+extern crate plugin;
 extern crate dtl;
 extern crate postgres;
 extern crate r2d2;
