@@ -1,20 +1,30 @@
 mod main;
+mod consumer;
 
 use iron::prelude::*;
 use iron::headers::*;
 use iron::middleware::{Handler, AroundMiddleware};
 use iron::status;
-use router::Router;
+use iron_mountrouter::{Router, MethodPicker};
 use session::CurrentSession;
 
 
 pub fn append_entry(router: &mut Router) {
-	let mut get_entry = Chain::new(self::main::entry);
-	get_entry.around(AdminPreprocessor);
-	router.get("/admin/", get_entry);
-	let mut post_entry = Chain::new(self::main::add_user);
-	post_entry.around(AdminPreprocessor);
-	router.post("/admin/add_user/", post_entry);
+	let mut subrouter = Router::new();
+
+	let mut main_picker = MethodPicker::new();
+	main_picker.get(self::main::entry);
+	subrouter.add_route("/", main_picker, false);
+
+	let mut add_user_picker = MethodPicker::new();
+	add_user_picker.post(self::main::add_user);
+	subrouter.add_route("/add_user/", add_user_picker, false);
+	
+	consumer::append_entry(&mut subrouter);
+	
+	let mut preprocessor = Chain::new(subrouter);
+	preprocessor.around(AdminPreprocessor);
+	router.add_route("/admin/", preprocessor, true);
 }
 
 struct AdminHandler {

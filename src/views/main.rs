@@ -3,7 +3,7 @@ use iron::prelude::*;
 use iron::status;
 use iron::headers::*;
 use persistent::Read;
-use router::Router;
+use iron_mountrouter::{Router, MethodPicker};
 use dtl::{Context, HashMapContext};
 use models::Consumer;
 use dtl_impls::ConsumerList;
@@ -25,5 +25,7 @@ fn entry(req: &mut Request) -> IronResult<Response> {
 }
 
 pub fn append_entry(router: &mut Router) {
-	router.get("/", entry);
+	let mut picker = MethodPicker::new();
+	picker.get(entry);
+	router.add_route("/", picker, false); 
 }

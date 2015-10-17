@@ -5,19 +5,26 @@ use iron::prelude::*;
 use iron::middleware::{Handler, AroundMiddleware};
 use iron::status;
 use iron::typemap::Key;
-use router::Router;
+use iron_mountrouter::{Router, MethodPicker};
 use persistent::Read;
 use models::Consumer;
 use db::Database;
 
 
 pub fn append_entry(router: &mut Router) {
-	let mut get_entry = Chain::new(self::main::entry);
-	get_entry.around(ConsumerPreprocessor);
-	router.get("/consumer/:id/", get_entry);
-	let mut post_entry = Chain::new(self::main::add_payment);
-	post_entry.around(ConsumerPreprocessor);
-	router.post("/consumer/:id/add_payment", post_entry);
+	let mut subrouter = Router::new();
+	
+	let mut consumer_picker = MethodPicker::new();
+	consumer_picker.get(self::main::entry);
+	subrouter.add_route("/", consumer_picker, false);
+	
+	let mut add_payment_picker = MethodPicker::new();
+	add_payment_picker.post(self::main::add_payment);
+	subrouter.add_route("/add_payment/", add_payment_picker, false);
+	
+	let mut preprocessor = Chain::new(subrouter);
+	preprocessor.around(ConsumerPreprocessor);
+	router.add_route("/consumer/:id/", preprocessor, true);
 }
 
 struct ConsumerHandler {
@@ -29,7 +36,7 @@ impl ConsumerHandler {
 		let id_opt;
 		{
 			let ref params = req.extensions.get::<Router>().unwrap();
-			id_opt = match i32::from_str(params.find("id").unwrap()) {
+			id_opt = match i32::from_str(params.get("id").unwrap()) {
 				Ok(consumer_id) => Some(consumer_id),
 				Err(_) => None
 			};

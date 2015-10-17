@@ -1,6 +1,5 @@
 mod main;
 mod admin;
-mod consumer;
 mod login;
 mod static_files;
 
@@ -9,7 +8,7 @@ use dtl::TemplateCompiler;
 use iron::prelude::*;
 use iron::typemap::Key;
 use persistent::{Read, State};
-use router::Router;
+use iron_mountrouter::Router;
 use db::{DbConnectionPool, Database};
 use session::MemorySessionStorage;
 
@@ -23,7 +22,6 @@ impl Key for SessionStorageKey { type Value = MemorySessionStorage; }
 pub fn get_root(pool: DbConnectionPool) -> Chain {
 	let mut router = Router::new();
 	main::append_entry(&mut router);
-	consumer::append_entry(&mut router);
 	admin::append_entry(&mut router);
 	login::append_entry(&mut router);
 	static_files::append_entry(&mut router);

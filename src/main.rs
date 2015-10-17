@@ -2,7 +2,7 @@ extern crate rand;
 extern crate iron;
 extern crate persistent;
 extern crate mount;
-extern crate router;
+extern crate iron_mountrouter;
 extern crate staticfile;
 extern crate oatmeal_raisin;
 extern crate plugin;
