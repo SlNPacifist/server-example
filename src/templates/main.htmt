@@ -1,10 +1,5 @@
 {% extends "base.htmt" %}
 
 {% block body %}
-	<h1>Список потребителей:</h1>
-	<ul>
-	{% for consumer in consumers %}
-		<li><a href="/consumer/{{consumer.id}}/">{{ consumer.address }}</a>
-    {% endfor %}
-    </ul>
+	<h1>Новости и объявления</h1>
 {% endblock %}
