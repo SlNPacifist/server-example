@@ -27,7 +27,7 @@
     {% else %}
     	<p>Нет ни одного платежа</p>
     {% endif %}
-    <form class="form-horizontal" action="add_payment" method="POST">
+    <form class="form-horizontal" action="add_payment" id="add-payment-form" method="POST">
     <fieldset>
     	<legend>Добавить платеж</legend>
     	<div class="form-group">

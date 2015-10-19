@@ -30,7 +30,7 @@ pub fn entry(req: &mut Request) -> IronResult<Response> {
 	ctx.set("payments", Box::new(VolumePaymentList::new(payments)));
 	ctx.set("total_volume_sum", Box::new(volume_sum));
 	ctx.set("today", Box::new(chrono::Local::today()));
-    let response_text = template_compiler.render(Path::new("consumer.htmt"), &ctx).unwrap();
+    let response_text = template_compiler.render(Path::new("admin/consumer.htmt"), &ctx).unwrap();
     let mut res = Response::with((status::Ok, response_text));
     res.headers.set(ContentType::html());
     Ok(res)
