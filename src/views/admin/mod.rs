@@ -1,5 +1,6 @@
 mod main;
 mod consumer;
+mod user;
 
 use iron::prelude::*;
 use iron::headers::*;
@@ -16,11 +17,8 @@ pub fn append_entry(router: &mut Router) {
 	main_picker.get(self::main::entry);
 	subrouter.add_route("/", main_picker, false);
 
-	let mut add_user_picker = MethodPicker::new();
-	add_user_picker.post(self::main::add_user);
-	subrouter.add_route("/add_user/", add_user_picker, false);
-	
 	consumer::append_entry(&mut subrouter);
+	user::append_entry(&mut subrouter);
 	
 	let mut preprocessor = Chain::new(subrouter);
 	preprocessor.around(AdminPreprocessor);
