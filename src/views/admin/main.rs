@@ -7,7 +7,7 @@ use persistent::Read;
 use urlencoded::{QueryMap, UrlEncodedBody};
 use dtl::{Context, HashMapContext};
 use models::{User, UserRole, Consumer};
-use dtl_impls::ConsumerList;
+use dtl_impls::{ConsumerWithPaymentInfoList};
 use db::Database;
 use views::TemplateCompilerKey;
 use forms::*;
@@ -15,10 +15,10 @@ use forms::*;
 
 pub fn entry(req: &mut Request) -> IronResult<Response> {
 	let pool = req.get::<Read<Database>>().unwrap();
-	let consumers = Consumer::all(&pool.get().unwrap());
+	let consumers = Consumer::ordered_by_last_payment(&pool.get().unwrap());
 	let template_compiler = req.get::<Read<TemplateCompilerKey>>().unwrap();
     let mut ctx = HashMapContext::new();
-    let tmp: ConsumerList = consumers.into();
+    let tmp: ConsumerWithPaymentInfoList = consumers.into();
     ctx.set("consumers", Box::new(tmp));
     let response_text = template_compiler.render(Path::new("admin/main.htmt"), &ctx).unwrap();
     let mut res = Response::with((status::Ok, response_text));

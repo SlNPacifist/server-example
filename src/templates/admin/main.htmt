@@ -49,4 +49,21 @@
 		</div>
 	</fieldset>
     </form>
+    
+    <table class="table">
+    	<tr>
+    		<th>Адрес</th>
+    		<th>Оплаченный объем</th>
+    		<th>Дата последней оплаты</th>
+    		<th></th>
+    	</tr>
+    	{% for cwp in consumers %}
+    	<tr>
+    		<td>{{cwp.consumer.address}}</td>
+    		<td>{{cwp.total_volume}}</td>
+    		<td>{{cwp.last_payment_date|default:Не было ни одной оплаты}}</td>
+    		<td><a href="/admin/consumer/{{cwp.consumer.id}}/add_payment/">Добавить квитанцию</a></td>
+    	</tr>
+    	{% endfor %}
+    </table>
 {% endblock %}
