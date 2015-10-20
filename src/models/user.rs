@@ -64,33 +64,4 @@ impl User {
         	None => None
         }
 	}
-	
-	pub fn all(c: &Connection) -> Vec<User> {
-        let stmt = c.prepare("SELECT login, consumer_id, role FROM user LEFT JOIN consumer (address) ON (consumer_id = consumer.id)").unwrap();
-        let mut res = Vec::new();
-        for row in stmt.query(&[]).unwrap() {
-        	let role_id: i32 = row.get(2);
-        	let role = match role_id {
-        		0 => UserRole::Admin,
-        		_ => UserRole::User,
-        	};
-        	let consumer_id: Option<i32> = row.get(1);
-        	let consumer = match consumer_id {
-        		None => None,
-        		Some(id) => {
-        			Some(Consumer {
-        				id: id,
-        				address: row.get(3),
-        			})
-        		}
-        	};
-            res.push(User {
-				login: row.get(0),
-				consumer_id: consumer_id,
-				consumer: consumer,
-				role: role,
-            });
-    	}
-        res
-    }
 }
