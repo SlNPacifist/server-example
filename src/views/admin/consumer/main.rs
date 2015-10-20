@@ -9,7 +9,7 @@ use dtl::{Context, HashMapContext};
 use chrono;
 use chrono::NaiveDate;
 use db::Database;
-use models::VolumePayment;
+use models::{VolumePayment, Consumer};
 use dtl_impls::VolumePaymentList;
 use super::ConsumerHandler;
 use views::TemplateCompilerKey;
@@ -57,6 +57,26 @@ pub fn add_payment(req: &mut Request) -> IronResult<Response> {
 	}
 }
 
+pub fn add_consumer(req: &mut Request) -> IronResult<Response> {
+	let form_opt = AddConsumerForm::new(&req.get::<UrlEncodedBody>().unwrap());
+	let connection = req.get::<Read<Database>>().unwrap().get().unwrap();
+	match form_opt {
+		Ok(form) => {
+			Consumer::insert(&connection, form.address);
+			let mut res = Response::with(status::SeeOther);
+		    let location = Location("/admin/?consumer_added".to_string());
+			res.headers.set(location);
+			Ok(res)
+		}
+		Err(_) => {
+			let mut res = Response::with(status::SeeOther);
+		    let location = Location("/admin/?consumer_not_added".to_string());
+			res.headers.set(location);
+			Ok(res)
+		}
+	}
+}
+
 #[derive(Debug, Clone)]
 struct AddPaymentForm {
 	volume: f32,
@@ -96,6 +116,19 @@ impl AddPaymentForm {
 			volume: try!(Self::get_volume(source.get("volume"))),
 			payment_sum: try!(Self::get_payment_sum(source.get("payment_sum"))),
 			payment_date: try!(Self::get_payment_date(source.get("payment_date"))),
+		})
+	}
+}
+
+#[derive(Debug, Clone)]
+struct AddConsumerForm {
+	address: String,
+}
+
+impl AddConsumerForm {
+	pub fn new(source: &QueryMap) -> Result<AddConsumerForm> {
+		Ok(AddConsumerForm {
+			address: try!(parse_single_field(source.get("volume"), "address")).to_string(),
 		})
 	}
 }

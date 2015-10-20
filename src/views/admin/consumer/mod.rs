@@ -25,6 +25,7 @@ pub fn append_entry(router: &mut Router) {
 	let mut preprocessor = Chain::new(subrouter);
 	preprocessor.around(ConsumerPreprocessor);
 	router.add_route("/consumer/:id/", preprocessor, true);
+	router.add_route("/consumer/add/", self::main::add_consumer, true);
 }
 
 struct ConsumerHandler {

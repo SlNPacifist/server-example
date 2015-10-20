@@ -5,7 +5,7 @@
 {% block body %}
 	<h1>Админка - главная странца</h1>
 	<a href="/admin/user/add/">Добавить нового пользователя админки</a>
-	<p>Список потребителей, отсортированный по дате последней оплаты</p>
+	<h3>Список потребителей, отсортированный по дате последней оплаты</h3>
     <table class="table">
     	<tr>
     		<th>Адрес</th>
@@ -22,4 +22,21 @@
     	</tr>
     	{% endfor %}
     </table>
+    
+    <form class="form-horizontal" action="consumer/add/" method="POST">
+    <fieldset>
+    	<legend>Добавить потребителя</legend>
+    	<div class="form-group">
+  			<label class="control-label col-md-4" for="address">Адрес</label>  
+			<div class="col-md-4">
+		    	<input id="address" name="volume" type="text" class="form-control input-md">
+		    </div>
+		</div>
+		<div class="form-group">
+		  	<div class="col-md-4">
+		  		<input type="submit" value="Добавить потребителя" class="btn btn-primary">
+		  	</div>
+		</div>
+	</fieldset>
+    </form>
 {% endblock %}

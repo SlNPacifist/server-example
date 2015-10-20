@@ -53,4 +53,10 @@ impl Consumer {
 		}
 		res
 	}
+	
+	pub fn insert(c: &Connection, address: String) {
+		c.execute("INSERT INTO consumer (address) VALUES ($1)",
+			&[&address]
+		).unwrap();
+	}
 }
