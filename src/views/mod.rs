@@ -26,7 +26,7 @@ pub fn get_root(pool: DbConnectionPool) -> Chain {
 	login::append_entry(&mut router);
 	static_files::append_entry(&mut router);
     let mut root = PathBuf::new();
-    root.push("/home/slnpacifist/eclipse_workspace/shop/src/templates");
+    root.push("./src/templates");
     let template_compiler = TemplateCompiler::new(root).unwrap();
     let session_storage = MemorySessionStorage::new();
 	let mut chain = Chain::new(router);
