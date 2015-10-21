@@ -5,3 +5,7 @@ body {
 body > .container {
   max-width: 1000px;
 }
+
+table tr.total-row {
+  font-weight: bold;
+}

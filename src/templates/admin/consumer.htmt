@@ -21,7 +21,7 @@
 		        	<td>{{ payment.sum }} руб</td>
 		        </tr>
 		    {% endfor %}
-		    <tr>
+		    <tr class="total-row">
 		    	<td>Итого</td>
 		    	<td>{{ total_volume_sum }} м<sup>3</td>
 		    	<td>{{ total_money_sum }} руб</td>
