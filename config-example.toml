@@ -1,0 +1,2 @@
+http_address = "localhost:3000"
+db_connection_string = "postgresql://user:password@localhost/dbname"

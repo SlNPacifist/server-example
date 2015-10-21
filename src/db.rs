@@ -9,11 +9,9 @@ pub struct Database;
 
 impl Key for Database { type Value = DbConnectionPool; }
 
-pub fn get_db_connection_pool() -> DbConnectionPool {
+pub fn get_db_connection_pool(connection_string: &str) -> DbConnectionPool {
     let config = Config::default();
-    let manager = PostgresConnectionManager::new(
-    	"postgresql://slnpacifist:postgres@localhost/water",
-        SslMode::None)
-    .unwrap();
-    Pool::new(config, manager).unwrap()
+    let manager = PostgresConnectionManager::new(connection_string, SslMode::None).expect(
+    	&format!("Could not connect to database {}", connection_string));
+    Pool::new(config, manager).expect("Could not create connection pool")
 }
