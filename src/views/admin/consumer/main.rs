@@ -44,13 +44,13 @@ pub fn add_payment(req: &mut Request) -> IronResult<Response> {
 		Ok(form) => {
 			VolumePayment::insert(&connection, form.volume, consumer.id, form.payment_date, form.payment_sum);
 			let mut res = Response::with(status::SeeOther);
-		    let location = Location(format!("/consumer/{}/?payment_added", consumer.id));
+		    let location = Location(format!("/admin/consumer/{}/?payment_added", consumer.id));
 			res.headers.set(location);
 			Ok(res)
 		}
 		Err(_) => {
 			let mut res = Response::with(status::SeeOther);
-		    let location = Location(format!("/consumer/{}/?payment_not_added", consumer.id));
+		    let location = Location(format!("/admin/consumer/{}/?payment_not_added", consumer.id));
 			res.headers.set(location);
 			Ok(res)
 		}
