@@ -23,12 +23,15 @@ pub fn entry(req: &mut Request) -> IronResult<Response> {
     let consumer = req.extensions.get::<ConsumerHandler>().unwrap();
 	let payments = VolumePayment::for_consumer(&connection, consumer.id);
 	let mut volume_sum = 0.0;
+	let mut money_sum = 0.0;
 	for p in payments.iter() {
 		volume_sum += p.volume;
+		money_sum += p.sum;
 	}
 	ctx.set("consumer", Box::new(consumer.clone()));
 	ctx.set("payments", Box::new(VolumePaymentList::new(payments)));
 	ctx.set("total_volume_sum", Box::new(volume_sum));
+	ctx.set("total_money_sum", Box::new(money_sum));
 	ctx.set("today", Box::new(chrono::Local::today()));
     let response_text = template_compiler.render(Path::new("admin/consumer.htmt"), &ctx).unwrap();
     let mut res = Response::with((status::Ok, response_text));

@@ -10,6 +10,7 @@
 				<tr>
 					<th>Дата</th>
 					<th>Объем</th>
+					<th>Сумма</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -17,11 +18,13 @@
 				<tr>
 		        	<td>{{ payment.payment_date|chrono_format:%d.%m.%Y }}</td>
 		        	<td>{{ payment.volume }} м<sup>3</sup></td>
+		        	<td>{{ payment.sum }} руб</td>
 		        </tr>
 		    {% endfor %}
 		    <tr>
 		    	<td>Итого</td>
 		    	<td>{{ total_volume_sum }} м<sup>3</td>
+		    	<td>{{ total_money_sum }} руб</td>
 		    </tr>
 	    </table>
     {% else %}

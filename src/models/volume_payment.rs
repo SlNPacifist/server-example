@@ -12,7 +12,7 @@ pub struct VolumePayment {
 
 impl VolumePayment {
 	pub fn for_consumer(c: &Connection, consumer_id: i32) -> Vec<VolumePayment> {
-        let stmt = c.prepare("SELECT id, volume, sum, payment_date FROM volume_payment where consumer_id = $1").unwrap();
+        let stmt = c.prepare("SELECT id, volume, sum, payment_date FROM volume_payment where consumer_id = $1 ORDER BY payment_date").unwrap();
         let mut res = Vec::new();
         for row in stmt.query(&[&consumer_id]).unwrap() {
             res.push(VolumePayment {
