@@ -3,11 +3,10 @@ mod consumer;
 mod user;
 
 use iron::prelude::*;
-use iron::headers::*;
 use iron::middleware::{Handler, AroundMiddleware};
-use iron::status;
 use iron_mountrouter::{Router, MethodPicker};
 use session::CurrentSession;
+use views::utils::redirect;
 
 
 pub fn append_entry(router: &mut Router) {
@@ -36,9 +35,7 @@ impl Handler for AdminHandler {
 				return self.org.handle(req);
 			}
 		}
-		let mut res = Response::with(status::SeeOther);
-		res.headers.set(Location(format!("/login/?reason=forbidden&next=/{}", req.url.path.join("/"))));
-		Ok(res)
+		redirect(format!("/login/?reason=forbidden&next=/{}", req.url.path.join("/")))
 	}
 }
 

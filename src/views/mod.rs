@@ -2,6 +2,7 @@ mod main;
 mod admin;
 mod login;
 mod static_files;
+mod utils;
 
 use std::path::PathBuf;
 use dtl::TemplateCompiler;

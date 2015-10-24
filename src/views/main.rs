@@ -1,20 +1,12 @@
-use std::path::Path;
 use iron::prelude::*;
-use iron::status;
-use iron::headers::*;
-use persistent::Read;
 use iron_mountrouter::{Router, MethodPicker};
-use dtl::{Context, HashMapContext};
-use views::TemplateCompilerKey;
+use dtl::HashMapContext;
+use views::utils::render_ok;
 
 
 fn entry(req: &mut Request) -> IronResult<Response> {
-	let template_compiler = req.get::<Read<TemplateCompilerKey>>().unwrap();
     let ctx = HashMapContext::new();
-    let response_text = template_compiler.render(Path::new("main.htmt"), &ctx).unwrap();
-    let mut res = Response::with((status::Ok, response_text));
-    res.headers.set(ContentType::html());
-    Ok(res)
+    render_ok(req, &ctx, "main.htmt")
 }
 
 pub fn append_entry(router: &mut Router) {

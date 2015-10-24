@@ -1,4 +1,3 @@
-use std::path::Path;
 use std::io::{Result, Error, ErrorKind};
 use iron::prelude::*;
 use iron::status;
@@ -10,13 +9,13 @@ use dtl::{Context, HashMapContext};
 use urlencoded::{QueryMap, UrlEncodedBody, UrlEncodedQuery};
 use models::User;
 use db::Database;
-use views::{TemplateCompilerKey, SessionStorageKey};
+use views::SessionStorageKey;
+use views::utils::{render_status, redirect};
 use forms::*;
 use session::{Session, SessionStorage};
 
 
 fn entry(req: &mut Request) -> IronResult<Response> {
-	let template_compiler = req.get::<Read<TemplateCompilerKey>>().unwrap();
     let mut ctx = HashMapContext::new();
 	let res_status = {
 		match req.get_ref::<UrlEncodedQuery>() {
@@ -35,14 +34,10 @@ fn entry(req: &mut Request) -> IronResult<Response> {
 			_ => status::Ok,
 		}
 	};
-    let response_text = template_compiler.render(Path::new("login.htmt"), &ctx).unwrap();
-    let mut res = Response::with((res_status, response_text));
-    res.headers.set(ContentType::html());
-    Ok(res)
+	render_status(req, &ctx, "login.htmt", res_status)
 }
 
 pub fn login_user(req: &mut Request) -> IronResult<Response> {
-	let mut res = Response::with(status::SeeOther);
 	let location = match UserLoginForm::new(&req.get::<UrlEncodedBody>().unwrap()) {
 		Ok(form) => {
 			let connection = req.get::<Read<Database>>().unwrap().get().unwrap();
@@ -63,23 +58,22 @@ pub fn login_user(req: &mut Request) -> IronResult<Response> {
 						Some(ref url) if url.starts_with("/") => true,
 						_ => false
 					};
-					Location(match is_sanitized {
+					match is_sanitized {
 						true => form.next.unwrap(),
 						false => "/".to_string()
-					})
+					}
 				}
 				None => {
-					Location("?user_not_logged_in".to_string())
+					"?user_not_logged_in".to_string()
 				}
 			}
 		}
 		Err(err) => {
 			println!("{:?}", err);
-			Location("?user_not_logged_in".to_string())
+			"?user_not_logged_in".to_string()
 		}
 	};
-	res.headers.set(location);
-	Ok(res)
+	redirect(location)
 }
 
 #[derive(Debug, Clone)]

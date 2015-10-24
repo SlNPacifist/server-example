@@ -1,8 +1,5 @@
-use std::path::Path;
 use std::io::{Result, Error, ErrorKind};
 use iron::prelude::*;
-use iron::status;
-use iron::headers::*;
 use persistent::Read;
 use urlencoded::{QueryMap, UrlEncodedBody};
 use dtl::{Context, HashMapContext};
@@ -12,72 +9,57 @@ use db::Database;
 use models::{VolumePayment, Consumer};
 use dtl_impls::VolumePaymentList;
 use super::ConsumerHandler;
-use views::TemplateCompilerKey;
+use views::utils::*;
 use forms::*;
 
 
 pub fn entry(req: &mut Request) -> IronResult<Response> {
-	let connection = req.get::<Read<Database>>().unwrap().get().unwrap();
-	let template_compiler = req.get::<Read<TemplateCompilerKey>>().unwrap();
-    let mut ctx = HashMapContext::new();
-    let consumer = req.extensions.get::<ConsumerHandler>().unwrap();
-	let payments = VolumePayment::for_consumer(&connection, consumer.id);
-	let mut volume_sum = 0.0;
-	let mut money_sum = 0.0;
-	for p in payments.iter() {
-		volume_sum += p.volume;
-		money_sum += p.sum;
+	let mut ctx = HashMapContext::new();
+	{
+		let connection = req.get::<Read<Database>>().unwrap().get().unwrap();
+		let consumer = req.extensions.get::<ConsumerHandler>().unwrap();
+		let payments = VolumePayment::for_consumer(&connection, consumer.id);
+		let mut volume_sum = 0.0;
+		let mut money_sum = 0.0;
+		for p in payments.iter() {
+			volume_sum += p.volume;
+			money_sum += p.sum;
+		}
+		ctx.set("consumer", Box::new(consumer.clone()));
+		ctx.set("payments", Box::new(VolumePaymentList::new(payments)));
+		ctx.set("total_volume_sum", Box::new(volume_sum));
+		ctx.set("total_money_sum", Box::new(money_sum));
+		ctx.set("today", Box::new(chrono::Local::today()));
 	}
-	ctx.set("consumer", Box::new(consumer.clone()));
-	ctx.set("payments", Box::new(VolumePaymentList::new(payments)));
-	ctx.set("total_volume_sum", Box::new(volume_sum));
-	ctx.set("total_money_sum", Box::new(money_sum));
-	ctx.set("today", Box::new(chrono::Local::today()));
-    let response_text = template_compiler.render(Path::new("admin/consumer.htmt"), &ctx).unwrap();
-    let mut res = Response::with((status::Ok, response_text));
-    res.headers.set(ContentType::html());
-    Ok(res)
+	
+	render_ok(req, &ctx, "admin/consumer.htmt")
 }
 
 pub fn add_payment(req: &mut Request) -> IronResult<Response> {
 	let form_opt = AddPaymentForm::new(&req.get::<UrlEncodedBody>().unwrap());
 	let connection = req.get::<Read<Database>>().unwrap().get().unwrap();
     let consumer = req.extensions.get::<ConsumerHandler>().unwrap();
-	match form_opt {
+	let loc = match form_opt {
 		Ok(form) => {
 			VolumePayment::insert(&connection, form.volume, consumer.id, form.payment_date, form.payment_sum);
-			let mut res = Response::with(status::SeeOther);
-		    let location = Location(format!("/admin/consumer/{}/?payment_added", consumer.id));
-			res.headers.set(location);
-			Ok(res)
+			format!("/admin/consumer/{}/?payment_added", consumer.id)
 		}
-		Err(_) => {
-			let mut res = Response::with(status::SeeOther);
-		    let location = Location(format!("/admin/consumer/{}/?payment_not_added", consumer.id));
-			res.headers.set(location);
-			Ok(res)
-		}
-	}
+		Err(_) => format!("/admin/consumer/{}/?payment_not_added", consumer.id)
+	};
+	redirect(loc)
 }
 
 pub fn add_consumer(req: &mut Request) -> IronResult<Response> {
 	let form_opt = AddConsumerForm::new(&req.get::<UrlEncodedBody>().unwrap());
 	let connection = req.get::<Read<Database>>().unwrap().get().unwrap();
-	match form_opt {
+	let loc = match form_opt {
 		Ok(form) => {
 			Consumer::insert(&connection, form.address);
-			let mut res = Response::with(status::SeeOther);
-		    let location = Location("/admin/?consumer_added".to_string());
-			res.headers.set(location);
-			Ok(res)
+			"/admin/?consumer_added"
 		}
-		Err(_) => {
-			let mut res = Response::with(status::SeeOther);
-		    let location = Location("/admin/?consumer_not_added".to_string());
-			res.headers.set(location);
-			Ok(res)
-		}
-	}
+		Err(_) => "/admin/?consumer_not_added"
+	};
+	redirect(loc.to_string())
 }
 
 #[derive(Debug, Clone)]

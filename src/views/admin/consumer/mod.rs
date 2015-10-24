@@ -3,12 +3,12 @@ mod main;
 use std::str::FromStr;
 use iron::prelude::*;
 use iron::middleware::{Handler, AroundMiddleware};
-use iron::status;
 use iron::typemap::Key;
 use iron_mountrouter::{Router, MethodPicker};
 use persistent::Read;
 use models::Consumer;
 use db::Database;
+use views::utils::*;
 
 
 pub fn append_entry(router: &mut Router) {
@@ -62,7 +62,7 @@ impl Handler for ConsumerHandler {
 				req.extensions.insert::<ConsumerHandler>(consumer);
 				self.org.handle(req)
 			},
-			None =>	Ok(Response::with(status::NotFound))
+			None =>	not_found()
 		}
 	}
 }

@@ -1,15 +1,12 @@
-use std::path::Path;
 use std::io::{Result, Error, ErrorKind};
 use iron::prelude::*;
-use iron::status;
-use iron::headers::*;
 use iron_mountrouter::{Router, MethodPicker};
 use persistent::Read;
 use urlencoded::{QueryMap, UrlEncodedBody};
 use dtl::{Context, HashMapContext};
 use models::{User, UserRole};
 use db::Database;
-use views::TemplateCompilerKey;
+use views::utils::*;
 use forms::*;
 
 
@@ -25,34 +22,28 @@ pub fn append_entry(router: &mut Router) {
 }
 
 pub fn entry(req: &mut Request) -> IronResult<Response> {
-	let template_compiler = req.get::<Read<TemplateCompilerKey>>().unwrap();
     let ctx = HashMapContext::new();
-    let response_text = template_compiler.render(Path::new("admin/add_user.htmt"), &ctx).unwrap();
-    let mut res = Response::with((status::Ok, response_text));
-    res.headers.set(ContentType::html());
-    Ok(res)
+    render_ok(req, &ctx, "admin/add_user.htmt")
 }
 
 pub fn add_user(req: &mut Request) -> IronResult<Response> {
-	let mut res = Response::with(status::SeeOther);
-	let location = match AddUserForm::new(&req.get::<UrlEncodedBody>().unwrap()) {
+	let loc = match AddUserForm::new(&req.get::<UrlEncodedBody>().unwrap()) {
 		Ok(form) => {
 			let connection = req.get::<Read<Database>>().unwrap().get().unwrap();
 			match User::create(&connection, form.login, form.password, form.role, form.consumer_id) {
-				Ok(_) => Location("/admin/user/add/?user_added".to_string()),
+				Ok(_) => "/admin/user/add/?user_added",
 				Err(err) => {
 					println!("{:?}", err);
-					Location("/admin/user/add/?user_not_added".to_string())
+					"/admin/user/add/?user_not_added"
 				}
 			}
 		}
 		Err(err) => {
 			println!("{:?}", err);
-			Location("/admin/user/add/?user_not_added".to_string())
+			"/admin/user/add/?user_not_added"
 		}
 	};
-	res.headers.set(location);
-	Ok(res)
+	redirect(loc.to_string())
 }
 
 #[derive(Debug, Clone)]
