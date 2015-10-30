@@ -16,7 +16,8 @@ pub struct Session {
 
 impl Session {
 	fn generate_id() -> String {
-		rand::OsRng::new().unwrap().gen_ascii_chars().take(SESSION_ID_LENGTH).collect()
+		rand::OsRng::new().expect("Could not create OsRng in Session::generate_id")
+			.gen_ascii_chars().take(SESSION_ID_LENGTH).collect()
 	}
 	
 	pub fn new(user: User) -> Session {

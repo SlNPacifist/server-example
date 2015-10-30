@@ -6,8 +6,10 @@ use views::{TemplateCompilerKey, ContextKey};
 use dtl::{Context, Value};
 
 pub fn render_status(req: &mut Request, template: &str, st: Status) -> IronResult<Response> {
-	let template_compiler = req.extensions.get::<TemplateCompilerKey>().unwrap();
-	let ctx = req.extensions.get::<ContextKey>().unwrap();
+	let template_compiler = req.extensions.get::<TemplateCompilerKey>()
+		.expect("Could not get template compiler in views::utils::render_status");
+	let ctx = req.extensions.get::<ContextKey>()
+		.expect("Could not get context in views::utils::render_status");
     let response_text = match template_compiler.render(Path::new(template), ctx) {
     	Ok(text) => text,
     	Err(error) => panic!("Could not render template {}: {}", template, error)
@@ -32,6 +34,7 @@ pub fn not_found() -> IronResult<Response> {
 }
 
 pub fn update_var(req: &mut Request, name: &str, val: Box<Value>) {
-	let ctx = req.extensions.get_mut::<ContextKey>().unwrap();
+	let ctx = req.extensions.get_mut::<ContextKey>()
+		.expect("Could not get context in views::utils::update_var");
 	ctx.set(name, val);
 }

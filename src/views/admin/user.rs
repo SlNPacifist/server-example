@@ -26,9 +26,13 @@ pub fn entry(req: &mut Request) -> IronResult<Response> {
 }
 
 pub fn add_user(req: &mut Request) -> IronResult<Response> {
-	let loc = match AddUserForm::new(&req.get::<UrlEncodedBody>().unwrap()) {
+	let loc = match AddUserForm::new(&req.get::<UrlEncodedBody>()
+		.expect("Could not get request body in views::admin::user::add_user")) {
+			
 		Ok(form) => {
-			let connection = req.get::<Read<Database>>().unwrap().get().unwrap();
+			let connection = req.get::<Read<Database>>()
+				.expect("Could not get connection pool in views::admin::user::add_user")
+				.get().expect("Could not get connection in views::admin::user::add_user");
 			match User::create(&connection, form.login, form.password, form.role, form.consumer_id) {
 				Ok(_) => "/admin/user/add/?user_added",
 				Err(err) => {

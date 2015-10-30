@@ -14,8 +14,11 @@ use forms::*;
 
 pub fn entry(req: &mut Request) -> IronResult<Response> {
 	{
-		let connection = req.get::<Read<Database>>().unwrap().get().unwrap();
-		let consumer = req.extensions.remove::<ConsumerHandler>().unwrap();
+		let connection = req.get::<Read<Database>>()
+			.expect("Could not get connection pool in admin::consumer::entry")
+			.get().expect("Could not get connection in admin::consumer::entry");
+		let consumer = req.extensions.remove::<ConsumerHandler>()
+			.expect("Could not get consumer in admin::consumer::entry");
 		let payments = VolumePayment::for_consumer(&connection, consumer.id);
 		let mut volume_sum = 0.0;
 		let mut money_sum = 0.0;
@@ -33,12 +36,19 @@ pub fn entry(req: &mut Request) -> IronResult<Response> {
 }
 
 pub fn add_payment(req: &mut Request) -> IronResult<Response> {
-	let form_opt = AddPaymentForm::new(&req.get::<UrlEncodedBody>().unwrap());
-	let connection = req.get::<Read<Database>>().unwrap().get().unwrap();
-    let consumer = req.extensions.get::<ConsumerHandler>().unwrap();
+	let form_opt = AddPaymentForm::new(
+		&req.get::<UrlEncodedBody>()
+			.expect("Could not get request body in admin::consumer::add_payment")
+	);
+	let connection = req.get::<Read<Database>>()
+		.expect("Could not get connection pool in admin::consumer::add_payment")
+		.get().expect("Could not get connection in admin::consumer::add_payment");
+    let consumer = req.extensions.get::<ConsumerHandler>()
+    	.expect("Could not get consumer in admin::consumer::add_payment");
 	let loc = match form_opt {
 		Ok(form) => {
-			VolumePayment::insert(&connection, form.volume, consumer.id, form.payment_date, form.payment_sum);
+			VolumePayment::insert(
+				&connection, form.volume, consumer.id, form.payment_date, form.payment_sum);
 			format!("/admin/consumer/{}/?payment_added", consumer.id)
 		}
 		Err(_) => format!("/admin/consumer/{}/?payment_not_added", consumer.id)
@@ -47,8 +57,12 @@ pub fn add_payment(req: &mut Request) -> IronResult<Response> {
 }
 
 pub fn add_consumer(req: &mut Request) -> IronResult<Response> {
-	let form_opt = AddConsumerForm::new(&req.get::<UrlEncodedBody>().unwrap());
-	let connection = req.get::<Read<Database>>().unwrap().get().unwrap();
+	let form_opt = AddConsumerForm::new(&req.get::<UrlEncodedBody>()
+		.expect("Could not get request body in admin::consumer::add_consumer")
+	);
+	let connection = req.get::<Read<Database>>()
+		.expect("Could not get connection pool in admin::consumer::add_consumer")
+		.get().expect("Could not get connection in admin::consumer::add_consumer");
 	let loc = match form_opt {
 		Ok(form) => {
 			Consumer::insert(&connection, form.address);

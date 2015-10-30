@@ -39,19 +39,26 @@ fn entry(req: &mut Request) -> IronResult<Response> {
 }
 
 pub fn login_user(req: &mut Request) -> IronResult<Response> {
-	let location = match UserLoginForm::new(&req.get::<UrlEncodedBody>().unwrap()) {
+	let location = match UserLoginForm::new(&req.get::<UrlEncodedBody>()
+		.expect("Could not get request body in views::login::login_user")) {
+			
 		Ok(form) => {
-			let connection = req.get::<Read<Database>>().unwrap().get().unwrap();
+			let connection = req.get::<Read<Database>>()
+				.expect("Could not get connection pool in views::login::login_user")
+				.get().expect("Could not get connection in views::login::login_user");
 			match User::by_login_and_password(&connection, form.login, form.password) {
 				Some(user) => {
 					let session = Session::new(user);
 					{
-						let jar = req.get_mut::<or::CookieJar>().unwrap();
+						let jar = req.get_mut::<or::CookieJar>()
+							.expect("Could not get cookie storage in views::login::login_user");
 						jar.add(or::Cookie::new("session-id".into(), session.id.clone().into()));
 					}
 					{
-						let arc_session_storage = req.get::<State<SessionStorageKey>>().unwrap();
-						let mut session_storage = arc_session_storage.write().unwrap();
+						let arc_session_storage = req.get::<State<SessionStorageKey>>()
+							.expect("Could not get session storage in views::login::login_user");
+						let mut session_storage = arc_session_storage.write()
+							.expect("Could not add new session in views::login::login_user");
 						session_storage.insert(session);
 					}
 					let is_sanitized = match form.next {

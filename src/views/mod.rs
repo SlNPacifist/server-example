@@ -60,7 +60,8 @@ pub fn get_root(pool: DbConnectionPool) -> Chain {
 	static_files::append_entry(&mut router);
     let mut root = PathBuf::new();
     root.push("./src/templates");
-    let template_compiler = TemplateCompiler::new(root).unwrap();
+    let template_compiler = TemplateCompiler::new(root)
+    	.expect("Could not create template compiler in view::get_root");
     let template_compiler_preprocessor = TemplateCompilerPreprocessor::new(template_compiler);
     let session_storage = MemorySessionStorage::new();
 	let mut chain = Chain::new(router);

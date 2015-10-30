@@ -45,22 +45,36 @@ pub struct User {
 }
 
 impl User {
-	pub fn create(c: &Connection, login: String, password: String, role: UserRole, consumer_id: Option<i32>) -> Result<u64> {
-		c.execute(
-			"INSERT INTO \"user\" (login, password, role, consumer_id) VALUES ($1, crypt($2, gen_salt('bf', 8)), $3, $4)",
+	pub fn create(
+		c: &Connection,
+		login: String,
+		password: String,
+		role: UserRole,
+		consumer_id: Option<i32>) -> Result<u64> {
+			
+		c.execute(r#"
+			INSERT INTO "user" (login, password, role, consumer_id)
+			VALUES ($1, crypt($2, gen_salt('bf', 8)), $3, $4)"#,
 			&[&login, &password, &role.get_id(), &consumer_id]
 		)
 	}
 	
 	pub fn by_login_and_password(c: &Connection, login: String, password: String) -> Option<User> {
-        let stmt = c.prepare("SELECT login, role, consumer_id FROM \"user\" WHERE login = $1 AND password = crypt($2, password);").unwrap();
-        match stmt.query(&[&login, &password]).unwrap().iter().next() {
-        	Some(row) => Some(User {
-    			login: row.get(0),
-    			role: UserRole::from_id(row.get(1)).unwrap(),
-    			consumer_id: row.get(2),
-    			consumer: None,
-			}),
+        let stmt = c.prepare(r#"
+        	SELECT login, role, consumer_id FROM "user"
+        	WHERE login = $1 AND password = crypt($2, password)"#
+    	).expect("Could not prepare query for User::by_login_and_password");
+        match stmt.query(&[&login, &password]).expect(
+        	"Could not execute query for User::by_login_and_password").iter().next() {
+        		
+        	Some(row) => {
+        		Some(User {
+	    			login: row.get(0),
+	    			role: UserRole::from_id(row.get(1)).expect("Could not covert user role id"),
+	    			consumer_id: row.get(2),
+	    			consumer: None,
+				})
+			},
         	None => None
         }
 	}

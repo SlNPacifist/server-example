@@ -20,14 +20,16 @@ impl<'a, 'b> Plugin<Request<'a, 'b>> for CurrentSession {
 	
 	fn eval(req: &mut Request) -> Result<Session, SessionError> {
 		let session_id = {
-			let jar = req.get_mut::<or::CookieJar>().unwrap();
+			let jar = req.get_mut::<or::CookieJar>().expect("Could not get cookies in request");
 			match jar.find("session-id") {
 				Some(cookie) => cookie.value.clone(),
 				None => return Err(SessionError::NoSessionId),
 			}
 		};
-		let arc_session_storage = req.get::<State<SessionStorageKey>>().unwrap();
-		let session_storage = arc_session_storage.read().unwrap();
+		let arc_session_storage = req.get::<State<SessionStorageKey>>()
+			.expect("Could not get session storage in request");
+		let session_storage = arc_session_storage.read()
+			.expect("Could not read session storage");
 		match session_storage.by_id(&session_id) {
 			Some(session) => Ok(session.clone()),
 			None => Err(SessionError::NoSession),

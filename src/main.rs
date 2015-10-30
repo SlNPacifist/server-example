@@ -49,8 +49,10 @@ fn main() {
     if matches.subcommand_matches("start").is_some() {
     	start_server(config, pool);
 	} else if let Some(ref sub_matches) = matches.subcommand_matches("add-admin") {
-    	let name = sub_matches.value_of("name").unwrap();
-    	let password = sub_matches.value_of("password").unwrap();
+    	let name = sub_matches.value_of("name")
+    		.expect("Could not get _name_ param from command line");
+    	let password = sub_matches.value_of("password")
+    		.expect("Could not get _password_ param from command line");
     	add_admin(pool, name, password);
     }
 }
@@ -63,7 +65,7 @@ fn start_server(config: Config, pool: DbConnectionPool) {
 }
 
 fn add_admin(pool: DbConnectionPool, name: &str, password: &str) {
-	let connection = pool.get().unwrap();
+	let connection = pool.get().expect("Could not get connection in main::add_admin");
 	User::create(&connection, name.to_string(), password.to_string(), UserRole::Admin, None)
 		.expect_b("Could not add admin");
 	println!("Admin {} added", name);

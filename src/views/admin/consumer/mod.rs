@@ -36,16 +36,21 @@ impl ConsumerHandler {
 	fn get_consumer(req: &mut Request) -> Option<Consumer> {
 		let id_opt;
 		{
-			let ref params = req.extensions.get::<Router>().unwrap();
-			id_opt = match i32::from_str(params.get("id").unwrap()) {
+			let ref params = req.extensions.get::<Router>()
+				.expect("Could not get router params in ConsumerHandler::get_consumer");
+			id_opt = match i32::from_str(params.get("id")
+				.expect("Could not get id param in ConsumerHandler::get_consumer")) {
+					
 				Ok(consumer_id) => Some(consumer_id),
 				Err(_) => None
 			};
 		}
 		match id_opt {
 			Some(id) => { 
-				let pool = req.get::<Read<Database>>().unwrap();
-				let connection = pool.get().unwrap();
+				let pool = req.get::<Read<Database>>()
+					.expect("Could not get connection pool in ConsumerHandler::get_consumer");
+				let connection = pool.get()
+					.expect("Could not get connection in ConsumerHandler::get_consumer");
 				Consumer::by_id(&connection, id)
 			},
 			None => None

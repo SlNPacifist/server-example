@@ -13,8 +13,11 @@ pub struct Consumer {
 
 impl Consumer {
 	pub fn by_id(c: &Connection, id: i32) -> Option<Consumer> {
-        let stmt = c.prepare("SELECT address FROM consumer where id = $1").unwrap();
-        match stmt.query(&[&id]).unwrap().iter().next() {
+        let stmt = c.prepare("SELECT address FROM consumer where id = $1").expect(
+        	"Could not prepare query for Consumer::by_id");
+        match stmt.query(&[&id]).expect("Could not execute query for Consumer::by_id").iter()
+        	.next() {
+        		
         	Some(row) => Some(Consumer { id: id, address: row.get(0) }),
         	None => None
         }
@@ -30,9 +33,11 @@ impl Consumer {
 				LEFT JOIN volume_payment vp ON (c.id = vp.consumer_id)
 				GROUP BY c.id
 				ORDER BY last_payment_date NULLS FIRST
-			").unwrap();
+			").expect("Could not prepare query for Consumer::ordered_by_last_payment");
 		let mut res = Vec::new();
-		for row in stmt.query(&[]).unwrap() {
+		for row in stmt.query(&[]).expect(
+			"Could not execute query for Consumer::ordered_by_last_payment") {
+				
 			res.push((
 				Consumer {id: row.get(0), address: row.get(1)},
 				row.get(2),
@@ -45,6 +50,6 @@ impl Consumer {
 	pub fn insert(c: &Connection, address: String) {
 		c.execute("INSERT INTO consumer (address) VALUES ($1)",
 			&[&address]
-		).unwrap();
+		).expect("Could not execute query for Consumer::insert");
 	}
 }
