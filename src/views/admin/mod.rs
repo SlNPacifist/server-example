@@ -6,7 +6,7 @@ use iron::prelude::*;
 use iron::middleware::{Handler, AroundMiddleware};
 use iron_mountrouter::{Router, MethodPicker};
 use session::CurrentSession;
-use views::utils::redirect;
+use views::utils::*;
 
 
 pub fn append_entry(router: &mut Router) {
@@ -32,6 +32,7 @@ impl Handler for AdminHandler {
 	fn handle(&self, req: &mut Request) -> IronResult<Response> {
 		if let Ok(session) = req.get::<CurrentSession>() {
 			if session.user.role.is_admin() {
+				update_var(req, "in_admin", Box::new(true));
 				return self.org.handle(req);
 			}
 		}

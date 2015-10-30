@@ -5,36 +5,37 @@ use iron::headers::*;
 use persistent::{Read, State};
 use iron_mountrouter::{Router, MethodPicker};
 use oatmeal_raisin as or;
-use dtl::{Context, HashMapContext};
 use urlencoded::{QueryMap, UrlEncodedBody, UrlEncodedQuery};
 use models::User;
 use db::Database;
 use views::SessionStorageKey;
-use views::utils::{render_status, redirect};
+use views::utils::*;
 use forms::*;
 use session::{Session, SessionStorage};
 
 
 fn entry(req: &mut Request) -> IronResult<Response> {
-    let mut ctx = HashMapContext::new();
-	let res_status = {
-		match req.get_ref::<UrlEncodedQuery>() {
-			Ok(url_query) => {
-				if let Ok(next_url) = parse_single_field(url_query.get("next"), "") {
-					ctx.set("next", Box::new(next_url.to_string()));
-				}
-				match parse_single_field(url_query.get("reason"), "") {
-					Ok("forbidden") => {
-						ctx.set("is_forbidden", Box::new(true));
-						status::Forbidden
-					}
-					_ => status::Ok,
-				}
-			},
-			_ => status::Ok,
+    let mut next = None;
+    let mut is_forbidden = false;
+	if let Ok(url_query) = req.get_ref::<UrlEncodedQuery>() {
+		if let Ok(next_url) = parse_single_field(url_query.get("next"), "") {
+			next = Some(Box::new(next_url.to_string()));
+		}
+		match parse_single_field(url_query.get("reason"), "") {
+			Ok("forbidden") => is_forbidden = true,
+			_ => {}
 		}
 	};
-	render_status(req, &ctx, "login.htmt", res_status)
+	if let Some(n) = next {
+		update_var(req, "next", n);
+	}
+	let res_status = if is_forbidden {
+		update_var(req, "is_forbidden", Box::new(true));
+		status::Forbidden
+	} else {
+		status::Ok
+	};
+	render_status(req, "login.htmt", res_status)
 }
 
 pub fn login_user(req: &mut Request) -> IronResult<Response> {

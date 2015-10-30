@@ -2,7 +2,6 @@ use std::io::{Result, Error, ErrorKind};
 use iron::prelude::*;
 use persistent::Read;
 use urlencoded::{QueryMap, UrlEncodedBody};
-use dtl::{Context, HashMapContext};
 use chrono;
 use chrono::NaiveDate;
 use db::Database;
@@ -14,10 +13,9 @@ use forms::*;
 
 
 pub fn entry(req: &mut Request) -> IronResult<Response> {
-	let mut ctx = HashMapContext::new();
 	{
 		let connection = req.get::<Read<Database>>().unwrap().get().unwrap();
-		let consumer = req.extensions.get::<ConsumerHandler>().unwrap();
+		let consumer = req.extensions.remove::<ConsumerHandler>().unwrap();
 		let payments = VolumePayment::for_consumer(&connection, consumer.id);
 		let mut volume_sum = 0.0;
 		let mut money_sum = 0.0;
@@ -25,14 +23,13 @@ pub fn entry(req: &mut Request) -> IronResult<Response> {
 			volume_sum += p.volume;
 			money_sum += p.sum;
 		}
-		ctx.set("consumer", Box::new(consumer.clone()));
-		ctx.set("payments", Box::new(VolumePaymentList::new(payments)));
-		ctx.set("total_volume_sum", Box::new(volume_sum));
-		ctx.set("total_money_sum", Box::new(money_sum));
-		ctx.set("today", Box::new(chrono::Local::today()));
+		update_var(req, "consumer", Box::new(consumer)); 
+		update_var(req, "payments", Box::new(VolumePaymentList::new(payments))); 
+		update_var(req, "total_volume_sum", Box::new(volume_sum)); 
+		update_var(req, "total_money_sum", Box::new(money_sum)); 
+		update_var(req, "today", Box::new(chrono::Local::today())); 
 	}
-	
-	render_ok(req, &ctx, "admin/consumer.htmt")
+	render_ok(req, "admin/consumer.htmt")
 }
 
 pub fn add_payment(req: &mut Request) -> IronResult<Response> {

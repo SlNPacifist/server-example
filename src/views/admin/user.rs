@@ -3,7 +3,6 @@ use iron::prelude::*;
 use iron_mountrouter::{Router, MethodPicker};
 use persistent::Read;
 use urlencoded::{QueryMap, UrlEncodedBody};
-use dtl::{Context, HashMapContext};
 use models::{User, UserRole};
 use db::Database;
 use views::utils::*;
@@ -22,8 +21,7 @@ pub fn append_entry(router: &mut Router) {
 }
 
 pub fn entry(req: &mut Request) -> IronResult<Response> {
-    let ctx = HashMapContext::new();
-    render_ok(req, &ctx, "admin/add_user.htmt")
+    render_ok(req, "admin/add_user.htmt")
 }
 
 pub fn add_user(req: &mut Request) -> IronResult<Response> {

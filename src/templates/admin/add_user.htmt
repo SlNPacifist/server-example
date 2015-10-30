@@ -1,4 +1,4 @@
-{% extends "base.htmt" %}
+{% extends "admin/base.htmt" %}
 
 {% block title %} - добавить пользователя{% endblock %}
 

@@ -2,10 +2,18 @@ body {
   padding-top: 50px;
 }
 
+body.submenu-enabled {
+  padding-top: 100px;
+}
+
 body > .container {
   max-width: 1000px;
 }
 
 table tr.total-row {
   font-weight: bold;
+}
+
+nav.submenu {
+  top: 50px;
 }

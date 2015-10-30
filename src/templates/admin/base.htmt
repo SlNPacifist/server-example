@@ -1,0 +1,18 @@
+{% extends "base.htmt" %}
+
+{% block submenu %}
+    <nav class="navbar navbar-inverse navbar-fixed-top submenu">
+      <div class="container">
+        <div id="navbar" class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li><a href="/admin/">Главная страница админки</a></li>
+            <li><a href="/admin/user/add/">Добавить пользователя админки</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+{% endblock %}
+
+{% block body-subclasses %}
+class="submenu-enabled"
+{% endblock %}
