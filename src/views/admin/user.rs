@@ -21,6 +21,7 @@ pub fn append_entry(router: &mut Router) {
 }
 
 pub fn entry(req: &mut Request) -> IronResult<Response> {
+	update_var(req, "admin_menu_user", Box::new(true));
     render_ok(req, "admin/add_user.htmt")
 }
 

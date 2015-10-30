@@ -11,5 +11,6 @@ pub fn entry(req: &mut Request) -> IronResult<Response> {
 	let consumers = Consumer::ordered_by_last_payment(&pool.get().unwrap());
     let tmp: ConsumerWithPaymentInfoList = consumers.into();
     update_var(req, "consumers", Box::new(tmp));
+    update_var(req, "admin_menu_main", Box::new(true));
     render_ok(req, "admin/main.htmt")
 }
