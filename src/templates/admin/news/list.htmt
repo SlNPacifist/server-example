@@ -1,0 +1,21 @@
+{% extends "admin/base.htmt" %}
+
+{% block title %} - список новостей{% endblock %}
+
+{% block body %}
+	<h1>Список новостей на главной</h1>
+	<table class="table table-striped">
+		<tr>
+			<th>Дата публикации</th>
+			<th>Название</th>
+			<th>Действия</th>
+		</tr>
+	{% for n in news %}
+		<tr>
+			<td>{{ n.publication_date }}</td>
+			<td>{{ n.header }}</td>
+			<td>Здесь будут кнопки</td>
+		</tr>
+	{% endfor %}
+	</table>
+{% endblock %}

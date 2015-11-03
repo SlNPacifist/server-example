@@ -1,6 +1,7 @@
 mod main;
 mod consumer;
 mod user;
+mod news;
 
 use iron::prelude::*;
 use iron::middleware::{Handler, AroundMiddleware};
@@ -18,6 +19,7 @@ pub fn append_entry(router: &mut Router) {
 
 	consumer::append_entry(&mut subrouter);
 	user::append_entry(&mut subrouter);
+	news::append_entry(&mut subrouter);
 	
 	let mut preprocessor = Chain::new(subrouter);
 	preprocessor.around(AdminPreprocessor);
