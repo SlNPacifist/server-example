@@ -24,14 +24,12 @@ mod dtl_impls;
 mod forms;
 mod session;
 mod config;
-mod backport;
 
 use std::path::Path;
 use clap::{App, SubCommand};
 use db::DbConnectionPool;
 use models::{User, UserRole};
 use config::Config;
-use backport::ResultExpect;
 
 
 fn main() {
@@ -61,13 +59,13 @@ fn main() {
 fn start_server(config: Config, pool: DbConnectionPool) {
 	let root = views::get_root(pool);
 	println!("Server started");
-    iron::Iron::new(root).http(&config.http_address as &str).expect_b(
+    iron::Iron::new(root).http(&config.http_address as &str).expect(
     	&format!("Could not start server at {}", config.http_address));
 }
 
 fn add_admin(pool: DbConnectionPool, name: &str, password: &str) {
 	let connection = pool.get().expect("Could not get connection in main::add_admin");
 	User::create(&connection, name.to_string(), password.to_string(), UserRole::Admin, None)
-		.expect_b("Could not add admin");
+		.expect("Could not add admin");
 	println!("Admin {} added", name);
 }
