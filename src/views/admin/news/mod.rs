@@ -22,7 +22,7 @@ pub fn append_entry(router: &mut Router) {
 				post => self::add::process_add_news),
 		false);
 	append_single_entry(&mut subrouter);
-	router.add_route("/news/", subrouter, true);
+	router.add_route("/news/", NewsHandler(Box::new(subrouter)), true);
 }
 
 fn append_single_entry(router: &mut Router) {
@@ -31,13 +31,23 @@ fn append_single_entry(router: &mut Router) {
 		picker!(get => self::single::show,
 				post => self::single::save),
 		true);
-	let preprocessor = NewsHandler(Box::new(subrouter));
-	router.add_route("/:news-id/", preprocessor, false);
+	router.add_route("/:news-id/", SingleNewsHandler(Box::new(subrouter)), false);
 }
 
-pub struct NewsHandler(Box<Handler>);
 
-impl NewsHandler {
+struct NewsHandler(Box<Handler>);
+
+impl Handler for NewsHandler {
+	fn handle(&self, req: &mut Request) -> IronResult<Response> {
+		update_var(req, "admin_menu_news", Box::new(true));
+		self.0.handle(req)
+	}
+}
+
+
+pub struct SingleNewsHandler(Box<Handler>);
+
+impl SingleNewsHandler {
 	fn get_news(req: &mut Request) -> Option<News> {
 		let id_opt;
 		{
@@ -63,13 +73,13 @@ impl NewsHandler {
 	}
 }
 
-impl Key for NewsHandler { type Value = News; }
+impl Key for SingleNewsHandler { type Value = News; }
 
-impl Handler for NewsHandler {
+impl Handler for SingleNewsHandler {
 	fn handle(&self, req: &mut Request) -> IronResult<Response> {
 		match Self::get_news(req) {
 			Some(news) => {
-				req.extensions.insert::<NewsHandler>(news);
+				req.extensions.insert::<SingleNewsHandler>(news);
 				self.0.handle(req)
 			},
 			None =>	not_found()

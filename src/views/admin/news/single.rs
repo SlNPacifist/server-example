@@ -3,12 +3,12 @@ use persistent::Read;
 use db::Database;
 use models::News;
 use views::utils::*;
-use super::NewsHandler;
+use super::SingleNewsHandler;
 use super::forms::NewsForm;
 
 
 pub fn show(req: &mut Request) -> IronResult<Response> {
-	let news = req.extensions.remove::<NewsHandler>()
+	let news = req.extensions.remove::<SingleNewsHandler>()
 		.expect("Could not get news id in admin::news::singe::show_edit");
 	update_var(req, "news", Box::new(news));
 	render_ok(req, "admin/news/single.htmt")
@@ -19,7 +19,7 @@ pub fn save(req: &mut Request) -> IronResult<Response> {
 	let connection = req.get::<Read<Database>>()
 		.expect("Could not get connection pool in admin::news::single::save")
 		.get().expect("Could not get connection in admin::news::single::save");
-	let news = req.extensions.remove::<NewsHandler>()
+	let news = req.extensions.remove::<SingleNewsHandler>()
 		.expect("Could not get news id in admin::news::singe::show_edit");
 	let is_saved = match form_opt {
 		Ok(form) => {

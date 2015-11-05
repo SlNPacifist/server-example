@@ -3,7 +3,8 @@
 {% block title %} - список новостей{% endblock %}
 
 {% block body %}
-	<h1>Список новостей на главной</h1>
+	<h1>Новости</h1>
+    <a href="add/">Добавить новость</a>
 	<table class="table table-striped">
 		<tr>
 			<th>Дата публикации</th>
