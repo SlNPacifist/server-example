@@ -7,7 +7,7 @@ use std::str::FromStr;
 use iron::prelude::*;
 use iron::middleware::Handler;
 use iron::typemap::Key;
-use iron_mountrouter::{Router, MethodPicker};
+use iron_mountrouter::Router;
 use persistent::Read;
 use models::News;
 use db::Database;
@@ -16,28 +16,21 @@ use views::utils::*;
 
 pub fn append_entry(router: &mut Router) {
 	let mut subrouter = Router::new();
-	
-	let mut news_picker = MethodPicker::new();
-	news_picker.get(self::main::all_news);
-	subrouter.add_route("/", news_picker, false);
-	
-	let mut add_picker = MethodPicker::new();
-	add_picker.get(self::add::add_news);
-	add_picker.post(self::add::process_add_news);
-	subrouter.add_route("/add/", add_picker, false);
-	
+	subrouter.add_route("/", picker!(get => self::main::all_news), false);
+	subrouter.add_route("/add/",
+		picker!(get => self::add::add_news,
+				post => self::add::process_add_news),
+		false);
 	append_single_entry(&mut subrouter);
 	router.add_route("/news/", subrouter, true);
 }
 
 fn append_single_entry(router: &mut Router) {
 	let mut subrouter = Router::new();
-	
-	let mut picker = MethodPicker::new();
-	picker.get(self::single::show);
-	picker.post(self::single::save);
-	subrouter.add_route("/", picker, true);
-	
+	subrouter.add_route("/",
+		picker!(get => self::single::show,
+				post => self::single::save),
+		true);
 	let preprocessor = NewsHandler(Box::new(subrouter));
 	router.add_route("/:news-id/", preprocessor, false);
 }

@@ -5,17 +5,14 @@ mod news;
 
 use iron::prelude::*;
 use iron::middleware::{Handler, AroundMiddleware};
-use iron_mountrouter::{Router, MethodPicker};
+use iron_mountrouter::Router;
 use session::CurrentSession;
 use views::utils::*;
 
 
 pub fn append_entry(router: &mut Router) {
 	let mut subrouter = Router::new();
-
-	let mut main_picker = MethodPicker::new();
-	main_picker.get(self::main::entry);
-	subrouter.add_route("/", main_picker, false);
+	subrouter.add_route("/", picker!(get => self::main::entry), false);
 
 	consumer::append_entry(&mut subrouter);
 	user::append_entry(&mut subrouter);

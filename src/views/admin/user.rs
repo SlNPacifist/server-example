@@ -1,6 +1,6 @@
 use std::io::{Result, Error, ErrorKind};
 use iron::prelude::*;
-use iron_mountrouter::{Router, MethodPicker};
+use iron_mountrouter::Router;
 use persistent::Read;
 use urlencoded::{QueryMap, UrlEncodedBody};
 use models::{User, UserRole};
@@ -11,12 +11,10 @@ use forms::*;
 
 pub fn append_entry(router: &mut Router) {
 	let mut subrouter = Router::new();
-
-	let mut add_user_picker = MethodPicker::new();
-	add_user_picker.post(add_user);
-	add_user_picker.get(entry);
-	subrouter.add_route("/add/", add_user_picker, false);
-	
+	subrouter.add_route("/add/",
+		picker!(post => add_user,
+				get => entry),
+		false);
 	router.add_route("/user/", subrouter, true);
 }
 

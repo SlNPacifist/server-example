@@ -1,5 +1,5 @@
 use iron::prelude::*;
-use iron_mountrouter::{Router, MethodPicker};
+use iron_mountrouter::Router;
 use persistent::Read;
 use views::utils::*;
 use db::Database;
@@ -17,7 +17,5 @@ fn entry(req: &mut Request) -> IronResult<Response> {
 }
 
 pub fn append_entry(router: &mut Router) {
-	let mut picker = MethodPicker::new();
-	picker.get(entry);
-	router.add_route("/", picker, false); 
+	router.add_route("/", picker!(get => entry), false); 
 }

@@ -4,7 +4,7 @@ use std::str::FromStr;
 use iron::prelude::*;
 use iron::middleware::Handler;
 use iron::typemap::Key;
-use iron_mountrouter::{Router, MethodPicker};
+use iron_mountrouter::Router;
 use persistent::Read;
 use models::Consumer;
 use db::Database;
@@ -13,14 +13,8 @@ use views::utils::*;
 
 pub fn append_entry(router: &mut Router) {
 	let mut subrouter = Router::new();
-	
-	let mut consumer_picker = MethodPicker::new();
-	consumer_picker.get(self::main::entry);
-	subrouter.add_route("/", consumer_picker, false);
-	
-	let mut add_payment_picker = MethodPicker::new();
-	add_payment_picker.post(self::main::add_payment);
-	subrouter.add_route("/add_payment/", add_payment_picker, false);
+	subrouter.add_route("/", picker!(get => self::main::entry), false);
+	subrouter.add_route("/add_payment/", picker!(post => self::main::add_payment), false);
 	
 	let preprocessor = ConsumerHandler(Box::new(subrouter));
 	router.add_route("/consumer/:id/", preprocessor, true);

@@ -3,7 +3,7 @@ use iron::prelude::*;
 use iron::status;
 use iron::headers::*;
 use persistent::{Read, State};
-use iron_mountrouter::{Router, MethodPicker};
+use iron_mountrouter::Router;
 use oatmeal_raisin as or;
 use urlencoded::{QueryMap, UrlEncodedBody, UrlEncodedQuery};
 use models::User;
@@ -120,12 +120,7 @@ impl UserLoginForm {
 }
 
 pub fn append_entry(router: &mut Router) {
-	let mut picker = MethodPicker::new();
-	picker.get(entry);
-	
 	let mut chain = Chain::new(login_user);
 	chain.link_after(or::SetCookie);
-	picker.post(chain);
-	
-	router.add_route("/login/", picker, false);
+	router.add_route("/login/", picker!(get => entry, post => chain), false);
 }

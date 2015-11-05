@@ -2,6 +2,7 @@ extern crate rand;
 extern crate iron;
 extern crate persistent;
 extern crate mount;
+#[macro_use]
 extern crate iron_mountrouter;
 extern crate staticfile;
 extern crate oatmeal_raisin;
