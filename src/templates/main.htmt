@@ -2,4 +2,8 @@
 
 {% block body %}
 	<h1>Новости и объявления</h1>
+	{% for n in news %}
+	<h2>{{ n.header }}</h2>
+	<div>{{ n.text }}</div>
+	{% endfor %}
 {% endblock %}

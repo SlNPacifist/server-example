@@ -18,7 +18,7 @@ impl News {
 		let stmt = c.prepare("
 				SELECT id, text, header, publication_date
 				FROM news
-				ORDER BY publication_date, id
+				ORDER BY publication_date DESC, id DESC
 				LIMIT $1
 			").expect("Could not prepare query for News::ordered_by_date");
 		stmt.query(&[&limit])
