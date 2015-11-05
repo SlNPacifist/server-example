@@ -1,5 +1,6 @@
 mod main;
 mod add;
+mod single;
 
 use std::str::FromStr;
 use iron::prelude::*;
@@ -21,21 +22,32 @@ pub fn append_entry(router: &mut Router) {
 	
 	let mut add_picker = MethodPicker::new();
 	add_picker.get(self::add::add_news);
-	add_picker.post(self::add::procerss_add_news);
+	add_picker.post(self::add::process_add_news);
 	subrouter.add_route("/add/", add_picker, false);
 //	
 //	let mut add_payment_picker = MethodPicker::new();
 //	add_payment_picker.post(self::main::add_payment);
 //	subrouter.add_route("/add_payment/", add_payment_picker, false);
 //	
-//	let mut preprocessor = Chain::new(subrouter);
-//	preprocessor.around(NewsPreprocessor);
-//	router.add_route("/consumer/:id/", preprocessor, true);
-//	router.add_route("/news/add/", self::main::add_consumer, true);
+	
+	append_single_entry(&mut subrouter);
 	router.add_route("/news/", subrouter, true);
 }
 
-struct NewsHandler(Box<Handler>);
+fn append_single_entry(router: &mut Router) {
+	let mut subrouter = Router::new();
+	
+	let mut picker = MethodPicker::new();
+	picker.get(self::single::show);
+	picker.post(self::single::save);
+	subrouter.add_route("/", picker, true);
+	
+	let mut preprocessor = Chain::new(subrouter);
+	preprocessor.around(NewsPreprocessor);
+	router.add_route("/:news-id/", preprocessor, false);
+}
+
+pub struct NewsHandler(Box<Handler>);
 
 impl NewsHandler {
 	fn get_news(req: &mut Request) -> Option<News> {
@@ -43,7 +55,7 @@ impl NewsHandler {
 		{
 			let ref params = req.extensions.get::<Router>()
 				.expect("Could not get router params in NewsHandler::get_news");
-			id_opt = match i32::from_str(params.get("id")
+			id_opt = match i32::from_str(params.get("news-id")
 				.expect("Could not get id param in NewsHandler::get_news")) {
 					
 				Ok(consumer_id) => Some(consumer_id),

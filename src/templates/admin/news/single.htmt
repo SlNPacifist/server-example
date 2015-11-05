@@ -1,0 +1,18 @@
+{% extends "admin/base.htmt" %}
+
+{% block title %} - редактирование новости{% endblock %}
+
+{% block body %}
+	<h1>Изменение новости</h1>
+    <form action="" method="POST">
+    	<div class="form-group">
+  			<label for="header_field">Заголовок</label>
+  			<input id="header_field" class="form-control" name="header" type="text" value="{{ news.header }}">
+		</div>
+    	<div class="form-group">
+  			<label for="text_field">Текст</label>  
+	    	<textarea id="text_field" class="form-control" name="text">{{ news.text }}</textarea>
+		</div>
+  		<input type="submit" value="Сохранить" class="btn btn-primary">
+    </form>
+{% endblock %}

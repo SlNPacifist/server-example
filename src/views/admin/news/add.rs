@@ -9,7 +9,7 @@ use views::utils::*;
 use forms::*;
 
 
-pub fn procerss_add_news(req: &mut Request) -> IronResult<Response> {
+pub fn process_add_news(req: &mut Request) -> IronResult<Response> {
 	let form_opt = AddNewsForm::new(
 		&req.get::<UrlEncodedBody>()
 			.expect("Could not get request body in admin::news::add_news")

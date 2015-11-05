@@ -13,7 +13,7 @@
 	{% for n in news %}
 		<tr>
 			<td>{{ n.publication_date }}</td>
-			<td>{{ n.header }}</td>
+			<td><a href="/admin/news/{{n.id}}/" title="Править">{{ n.header }}</a></td>
 			<td>Здесь будут кнопки</td>
 		</tr>
 	{% endfor %}
