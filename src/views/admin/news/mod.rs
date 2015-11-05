@@ -1,6 +1,7 @@
 mod main;
 mod add;
 mod single;
+mod forms;
 
 use std::str::FromStr;
 use iron::prelude::*;

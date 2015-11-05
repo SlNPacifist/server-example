@@ -1,12 +1,10 @@
-use std::io::Result;
 use iron::prelude::*;
 use persistent::Read;
-use urlencoded::{QueryMap, UrlEncodedBody};
 use db::Database;
 use models::News;
 use views::utils::*;
-use forms::*;
 use super::NewsHandler;
+use super::forms::NewsForm;
 
 
 pub fn show(req: &mut Request) -> IronResult<Response> {
@@ -17,10 +15,7 @@ pub fn show(req: &mut Request) -> IronResult<Response> {
 }
 
 pub fn save(req: &mut Request) -> IronResult<Response> {
-	let form_opt = SaveNewsForm::new(
-		&req.get::<UrlEncodedBody>()
-			.expect("Could not get request body in admin::news::single::save")
-	);
+	let form_opt = NewsForm::from_request(req);
 	let connection = req.get::<Read<Database>>()
 		.expect("Could not get connection pool in admin::news::single::save")
 		.get().expect("Could not get connection in admin::news::single::save");
@@ -45,19 +40,4 @@ pub fn save(req: &mut Request) -> IronResult<Response> {
 		true => format!("/admin/news/{}/?news_saved", news.id),
 		false => format!("/admin/news/{}/?news_not_saved", news.id),
 	})
-}
-
-#[derive(Debug, Clone)]
-struct SaveNewsForm {
-	text: String,
-	header: String,
-}
-
-impl SaveNewsForm {
-	pub fn new(source: &QueryMap) -> Result<SaveNewsForm> {
-		Ok(SaveNewsForm {
-			text: try!(parse_single_field(source.get("text"), "text")).to_string(),
-			header: try!(parse_single_field(source.get("header"), "header")).to_string(),
-		})
-	}
 }
