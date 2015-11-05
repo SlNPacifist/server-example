@@ -25,11 +25,6 @@ pub fn append_entry(router: &mut Router) {
 	add_picker.get(self::add::add_news);
 	add_picker.post(self::add::process_add_news);
 	subrouter.add_route("/add/", add_picker, false);
-//	
-//	let mut add_payment_picker = MethodPicker::new();
-//	add_payment_picker.post(self::main::add_payment);
-//	subrouter.add_route("/add_payment/", add_payment_picker, false);
-//	
 	
 	append_single_entry(&mut subrouter);
 	router.add_route("/news/", subrouter, true);
