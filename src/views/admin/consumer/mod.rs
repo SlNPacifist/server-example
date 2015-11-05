@@ -2,7 +2,7 @@ mod main;
 
 use std::str::FromStr;
 use iron::prelude::*;
-use iron::middleware::{Handler, AroundMiddleware};
+use iron::middleware::Handler;
 use iron::typemap::Key;
 use iron_mountrouter::{Router, MethodPicker};
 use persistent::Read;
@@ -22,15 +22,12 @@ pub fn append_entry(router: &mut Router) {
 	add_payment_picker.post(self::main::add_payment);
 	subrouter.add_route("/add_payment/", add_payment_picker, false);
 	
-	let mut preprocessor = Chain::new(subrouter);
-	preprocessor.around(ConsumerPreprocessor);
+	let preprocessor = ConsumerHandler(Box::new(subrouter));
 	router.add_route("/consumer/:id/", preprocessor, true);
 	router.add_route("/consumer/add/", self::main::add_consumer, true);
 }
 
-struct ConsumerHandler {
-	org: Box<Handler>
-}
+struct ConsumerHandler(Box<Handler>);
 
 impl ConsumerHandler {
 	fn get_consumer(req: &mut Request) -> Option<Consumer> {
@@ -65,17 +62,9 @@ impl Handler for ConsumerHandler {
 		match Self::get_consumer(req) {
 			Some(consumer) => {
 				req.extensions.insert::<ConsumerHandler>(consumer);
-				self.org.handle(req)
+				self.0.handle(req)
 			},
 			None =>	not_found()
 		}
-	}
-}
-
-struct ConsumerPreprocessor;
-
-impl AroundMiddleware for ConsumerPreprocessor {
-	fn around(self, handler: Box<Handler>) -> Box<Handler> {
-		Box::new(ConsumerHandler { org: handler } )
 	}
 }

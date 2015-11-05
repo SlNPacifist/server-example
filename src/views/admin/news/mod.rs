@@ -5,7 +5,7 @@ mod forms;
 
 use std::str::FromStr;
 use iron::prelude::*;
-use iron::middleware::{Handler, AroundMiddleware};
+use iron::middleware::Handler;
 use iron::typemap::Key;
 use iron_mountrouter::{Router, MethodPicker};
 use persistent::Read;
@@ -38,8 +38,7 @@ fn append_single_entry(router: &mut Router) {
 	picker.post(self::single::save);
 	subrouter.add_route("/", picker, true);
 	
-	let mut preprocessor = Chain::new(subrouter);
-	preprocessor.around(NewsPreprocessor);
+	let preprocessor = NewsHandler(Box::new(subrouter));
 	router.add_route("/:news-id/", preprocessor, false);
 }
 
@@ -82,13 +81,5 @@ impl Handler for NewsHandler {
 			},
 			None =>	not_found()
 		}
-	}
-}
-
-struct NewsPreprocessor;
-
-impl AroundMiddleware for NewsPreprocessor {
-	fn around(self, handler: Box<Handler>) -> Box<Handler> {
-		Box::new(NewsHandler(handler) )
 	}
 }
