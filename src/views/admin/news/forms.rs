@@ -1,6 +1,5 @@
-use std::io::{Result, Error, ErrorKind};
+use std::io::Result;
 use iron::prelude::*;
-use urlencoded::UrlEncodedBody;
 use forms::*;
 
 
@@ -12,12 +11,7 @@ pub struct NewsForm {
 
 impl NewsForm {
 	pub fn from_request(req: &mut Request) -> Result<NewsForm> {
-		let body;
-		match req.get::<UrlEncodedBody>() {
-			Ok(b) => body = b,
-			Err(e) => return Err(Error::new(ErrorKind::InvalidInput,
-				format!("Could not get request body: {}", e)))
-		};
+		let body = try!(get_body(req));
 		Ok(NewsForm {
 			text: try!(parse_single_field(body.get("text"), "text")).to_string(),
 			header: try!(parse_single_field(body.get("header"), "header")).to_string(),

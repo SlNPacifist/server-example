@@ -2,7 +2,6 @@ use std::io::{Result, Error, ErrorKind};
 use iron::prelude::*;
 use iron_mountrouter::Router;
 use persistent::Read;
-use urlencoded::{QueryMap, UrlEncodedBody};
 use models::{User, UserRole};
 use db::Database;
 use views::utils::*;
@@ -24,9 +23,7 @@ pub fn entry(req: &mut Request) -> IronResult<Response> {
 }
 
 pub fn add_user(req: &mut Request) -> IronResult<Response> {
-	let loc = match AddUserForm::new(&req.get::<UrlEncodedBody>()
-		.expect("Could not get request body in views::admin::user::add_user")) {
-			
+	let loc = match AddUserForm::from_request(req) {
 		Ok(form) => {
 			let connection = req.get::<Read<Database>>()
 				.expect("Could not get connection pool in views::admin::user::add_user")
@@ -88,7 +85,8 @@ impl AddUserForm {
 			_ => Err(Error::new(ErrorKind::InvalidInput, format!("consumer_id field form is less then 0: {}", consumer_id)))
 		}
 	}
-	pub fn new(source: &QueryMap) -> Result<Self> {
+	pub fn from_request(req: &mut Request) -> Result<Self> {
+		let source = try!(get_body(req));
 		Ok(AddUserForm {
 			login: try!(Self::get_login(source.get("login"))),
 			password: try!(Self::get_password(source.get("password"))),

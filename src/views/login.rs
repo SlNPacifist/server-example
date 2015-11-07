@@ -5,7 +5,7 @@ use iron::headers::*;
 use persistent::{Read, State};
 use iron_mountrouter::Router;
 use oatmeal_raisin as or;
-use urlencoded::{QueryMap, UrlEncodedBody, UrlEncodedQuery};
+use urlencoded::UrlEncodedQuery;
 use models::User;
 use db::Database;
 use views::SessionStorageKey;
@@ -39,9 +39,7 @@ fn entry(req: &mut Request) -> IronResult<Response> {
 }
 
 pub fn login_user(req: &mut Request) -> IronResult<Response> {
-	let location = match UserLoginForm::new(&req.get::<UrlEncodedBody>()
-		.expect("Could not get request body in views::login::login_user")) {
-			
+	let location = match UserLoginForm::from_request(req) {
 		Ok(form) => {
 			let connection = req.get::<Read<Database>>()
 				.expect("Could not get connection pool in views::login::login_user")
@@ -110,7 +108,8 @@ impl UserLoginForm {
 			_ => None,
 		}
 	}
-	pub fn new(source: &QueryMap) -> Result<Self> {
+	pub fn from_request(req: &mut Request) -> Result<Self> {
+		let source = try!(get_body(req));
 		Ok(UserLoginForm {
 			login: try!(Self::get_login(source.get("login"))),
 			password: try!(Self::get_password(source.get("password"))),

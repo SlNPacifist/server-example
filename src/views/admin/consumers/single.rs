@@ -1,7 +1,6 @@
 use std::io::{Result, Error, ErrorKind};
 use iron::prelude::*;
 use persistent::Read;
-use urlencoded::{QueryMap, UrlEncodedBody};
 use chrono;
 use chrono::NaiveDate;
 use db::Database;
@@ -34,10 +33,7 @@ pub fn entry(req: &mut Request) -> IronResult<Response> {
 }
 
 pub fn add_payment(req: &mut Request) -> IronResult<Response> {
-	let form_opt = AddPaymentForm::new(
-		&req.get::<UrlEncodedBody>()
-			.expect("Could not get request body in admin::consumer::add_payment")
-	);
+	let form_opt = AddPaymentForm::from_request(req);
 	let connection = req.get::<Read<Database>>()
 		.expect("Could not get connection pool in admin::consumer::add_payment")
 		.get().expect("Could not get connection in admin::consumer::add_payment");
@@ -88,7 +84,8 @@ impl AddPaymentForm {
 			))
 		}
 	}
-	pub fn new(source: &QueryMap) -> Result<AddPaymentForm> {
+	pub fn from_request(req: &mut Request) -> Result<AddPaymentForm> {
+		let source = try!(get_body(req));
 		Ok(AddPaymentForm {
 			volume: try!(Self::get_volume(source.get("volume"))),
 			payment_sum: try!(Self::get_payment_sum(source.get("payment_sum"))),
