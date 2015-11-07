@@ -13,18 +13,16 @@ pub struct Consumer {
 
 impl Consumer {
 	pub fn by_id(c: &Connection, id: i32) -> Option<Consumer> {
-        let stmt = c.prepare("SELECT address FROM consumer where id = $1").expect(
-        	"Could not prepare query for Consumer::by_id");
-        match stmt.query(&[&id]).expect("Could not execute query for Consumer::by_id").iter()
-        	.next() {
-        		
-        	Some(row) => Some(Consumer { id: id, address: row.get(0) }),
-        	None => None
-        }
+        c.prepare("SELECT address FROM consumer where id = $1")
+        	.expect("Could not prepare query for Consumer::by_id")
+        	.query(&[&id])
+        	.expect("Could not execute query for Consumer::by_id")
+        	.iter().next()
+        	.map(|row| Consumer { id: id, address: row.get(0) })
 	}
 	
 	pub fn ordered_by_last_payment(c: &Connection) -> Vec<(Consumer, f32, Option<NaiveDate>)> {
-		let stmt = c.prepare("
+		c.prepare("
 				SELECT
 					c.id, c.address,
 					COALESCE(SUM(vp.volume), 0) as total_volume,
@@ -32,19 +30,15 @@ impl Consumer {
 				FROM consumer c
 				LEFT JOIN volume_payment vp ON (c.id = vp.consumer_id)
 				GROUP BY c.id
-				ORDER BY last_payment_date NULLS FIRST
-			").expect("Could not prepare query for Consumer::ordered_by_last_payment");
-		let mut res = Vec::new();
-		for row in stmt.query(&[]).expect(
-			"Could not execute query for Consumer::ordered_by_last_payment") {
-				
-			res.push((
-				Consumer {id: row.get(0), address: row.get(1)},
+				ORDER BY last_payment_date NULLS FIRST")
+			.expect("Could not prepare query for Consumer::ordered_by_last_payment")
+			.query(&[])
+			.expect("Could not execute query for Consumer::ordered_by_last_payment")
+			.iter().map(|row| {
+				(Consumer {id: row.get(0), address: row.get(1)},
 				row.get(2),
-				row.get(3),
-			));
-		}
-		res
+				row.get(3),)
+			}).collect()
 	}
 	
 	pub fn insert(c: &Connection, address: String) {
