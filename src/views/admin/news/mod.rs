@@ -22,7 +22,11 @@ pub fn append_entry(router: &mut Router) {
 				post => self::add::process_add_news),
 		false);
 	append_single_entry(&mut subrouter);
-	router.add_route("/news/", NewsHandler(Box::new(subrouter)), true);
+	let entry = move |req: &mut Request| {
+		update_var(req, "admin_menu_news", Box::new(true));
+		subrouter.handle(req)
+	};
+	router.add_route("/news/", entry, true);
 }
 
 fn append_single_entry(router: &mut Router) {
@@ -32,16 +36,6 @@ fn append_single_entry(router: &mut Router) {
 				post => self::single::save),
 		true);
 	router.add_route("/:news-id/", SingleNewsHandler(Box::new(subrouter)), false);
-}
-
-
-struct NewsHandler(Box<Handler>);
-
-impl Handler for NewsHandler {
-	fn handle(&self, req: &mut Request) -> IronResult<Response> {
-		update_var(req, "admin_menu_news", Box::new(true));
-		self.0.handle(req)
-	}
 }
 
 

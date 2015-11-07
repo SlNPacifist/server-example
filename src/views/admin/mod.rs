@@ -18,19 +18,15 @@ pub fn append_entry(router: &mut Router) {
 	user::append_entry(&mut subrouter);
 	news::append_entry(&mut subrouter);
 	
-	router.add_route("/admin/", AdminHandler(Box::new(subrouter)), true);
+	router.add_route("/admin/", move |req: &mut Request| admin_handle(req, &subrouter), true);
 }
 
-struct AdminHandler(Box<Handler>);
-
-impl Handler for AdminHandler {
-	fn handle(&self, req: &mut Request) -> IronResult<Response> {
-		if let Ok(session) = req.get::<CurrentSession>() {
-			if session.user.role.is_admin() {
-				update_var(req, "in_admin", Box::new(true));
-				return self.0.handle(req);
-			}
+fn admin_handle<T: Handler>(req: &mut Request, next: &T) -> IronResult<Response> {
+	if let Ok(session) = req.get::<CurrentSession>() {
+		if session.user.role.is_admin() {
+			update_var(req, "in_admin", Box::new(true));
+			return next.handle(req);
 		}
-		redirect(format!("/login/?reason=forbidden&next=/{}", req.url.path.join("/")))
 	}
+	redirect(format!("/login/?reason=forbidden&next=/{}", req.url.path.join("/")))
 }
