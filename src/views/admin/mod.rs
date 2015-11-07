@@ -1,5 +1,5 @@
 mod main;
-mod consumer;
+mod consumers;
 mod user;
 mod news;
 
@@ -14,7 +14,7 @@ pub fn append_entry(router: &mut Router) {
 	let mut subrouter = Router::new();
 	subrouter.add_route("/", picker!(get => self::main::entry), false);
 
-	consumer::append_entry(&mut subrouter);
+	consumers::append_entry(&mut subrouter);
 	user::append_entry(&mut subrouter);
 	news::append_entry(&mut subrouter);
 	

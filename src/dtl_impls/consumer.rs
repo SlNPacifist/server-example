@@ -73,8 +73,8 @@ impl ValueAsBool for ConsumerList {
 	}
 }
 
-impl From<Vec<Consumer>> for ConsumerList {
-	fn from(v: Vec<Consumer>) -> ConsumerList {
+impl ConsumerList {
+	pub fn new(v: Vec<Consumer>) -> ConsumerList {
 		ConsumerList {
 			consumers: v
 		}

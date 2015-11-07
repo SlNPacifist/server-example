@@ -1,5 +1,7 @@
 use std::io::{Result, Error, ErrorKind};
 use std::str::FromStr;
+use iron::prelude::*;
+use urlencoded::{QueryMap, UrlEncodedBody};
 
 
 pub fn parse_single_field<'a>(source: Option<&'a Vec<String>>, field_name: &str) -> Result<&'a str> {
@@ -27,4 +29,10 @@ pub fn parse_single_i32(source: Option<&Vec<String>>, field_name: &str) -> Resul
 		Ok(val) => Ok(val),
 		Err(reason) => Err(Error::new(ErrorKind::InvalidInput, format!("Could not parse {} field: {}", field_name, reason))),
 	}
+}
+
+pub fn get_body(req: &mut Request) -> Result<QueryMap> {
+	req.get::<UrlEncodedBody>().map_err(|e| {
+		Error::new(ErrorKind::InvalidInput, format!("Could not get request body: {}", e))
+	})
 }

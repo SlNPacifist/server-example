@@ -1,0 +1,36 @@
+{% extends "admin/base.htmt" %}
+
+{% block title %} - админка - список потребителей{% endblock %}
+
+{% block body %}
+	<h1>Админка - список потребителей</h1>
+    <form class="form-horizontal" action="/admin/consumers/add/" method="POST">
+    <fieldset>
+    	<legend>Добавить потребителя</legend>
+    	<div class="form-group">
+  			<label class="control-label col-md-4" for="address">Адрес</label>  
+			<div class="col-md-4">
+		    	<input id="address" name="volume" type="text" class="form-control input-md">
+		    </div>
+		</div>
+		<div class="form-group">
+		  	<div class="col-md-4">
+		  		<input type="submit" value="Добавить потребителя" class="btn btn-primary">
+		  	</div>
+		</div>
+	</fieldset>
+    </form>
+    
+    <table class="table">
+    	<tr>
+    		<th>Адрес</th>
+    		<th>Действия</th>
+    	</tr>
+    	{% for consumer in consumers %}
+    	<tr>
+    		<td><a href="/admin/consumers/{{consumer.id}}/">{{consumer.address}}</a></td>
+    		<td><a href="/admin/consumers/{{consumer.id}}/#add-payment-form">Добавить оплату</a></td>
+    	</tr>
+    	{% endfor %}
+    </table>
+{% endblock %}

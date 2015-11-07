@@ -1,4 +1,6 @@
-mod main;
+mod single;
+mod add;
+mod list;
 
 use std::str::FromStr;
 use iron::prelude::*;
@@ -13,12 +15,23 @@ use views::utils::*;
 
 pub fn append_entry(router: &mut Router) {
 	let mut subrouter = Router::new();
-	subrouter.add_route("/", picker!(get => self::main::entry), false);
-	subrouter.add_route("/add_payment/", picker!(post => self::main::add_payment), false);
+	subrouter.add_route("/add/", self::add::add_consumer, false);
+	subrouter.add_route("/", self::list::all, false);
+	append_single_entry(&mut subrouter);
+	let entry = move |req: &mut Request| {
+		update_var(req, "admin_menu_consumers", Box::new(true));
+		subrouter.handle(req)
+	};
+	router.add_route("/consumers/", entry, true);
+}
+
+fn append_single_entry(router: &mut Router) {
+	let mut subrouter = Router::new();
+	subrouter.add_route("/", picker!(get => self::single::entry), false);
+	subrouter.add_route("/add_payment/", picker!(post => self::single::add_payment), false);
 	
 	let preprocessor = ConsumerHandler(Box::new(subrouter));
-	router.add_route("/consumer/:id/", preprocessor, true);
-	router.add_route("/consumer/add/", self::main::add_consumer, true);
+	router.add_route("/:id/", preprocessor, true);
 }
 
 struct ConsumerHandler(Box<Handler>);

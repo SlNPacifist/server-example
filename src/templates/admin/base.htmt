@@ -6,6 +6,7 @@
         <div id="navbar" class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
             <li {% if admin_menu_main %}class="active"{% endif %}><a href="/admin/">Главная страница админки</a></li>
+            <li {% if admin_menu_consumers %}class="active"{% endif %}><a href="/admin/consumers/">Потребители</a></li>
             <li {% if admin_menu_news %}class="active"{% endif %}><a href="/admin/news/">Новости</a></li>
             <li {% if admin_menu_user %}class="active"{% endif %}><a href="/admin/user/add/">Добавить пользователя админки</a></li>
           </ul>

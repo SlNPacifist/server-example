@@ -41,6 +41,18 @@ impl Consumer {
 			}).collect()
 	}
 	
+	pub fn all(c: &Connection) -> Vec<Consumer> {
+		c.prepare("
+				SELECT id, address
+				FROM consumer c
+				ORDER BY id")
+			.expect("Could not prepare query for Consumer::all")
+			.query(&[])
+			.expect("Could not execute query for Consumer::all")
+			.iter().map(|row| Consumer {id: row.get(0), address: row.get(1)})
+			.collect()
+	}
+		
 	pub fn insert(c: &Connection, address: String) {
 		c.execute("INSERT INTO consumer (address) VALUES ($1)",
 			&[&address]
