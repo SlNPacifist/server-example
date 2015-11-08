@@ -23,7 +23,7 @@ pub fn append_entry(router: &mut Router) {
 		false);
 	append_single_entry(&mut subrouter);
 	let entry = move |req: &mut Request| {
-		update_var(req, "admin_menu_news", Box::new(true));
+		update_var(req, "admin_menu_news", true);
 		subrouter.handle(req)
 	};
 	router.add_route("/news/", entry, true);

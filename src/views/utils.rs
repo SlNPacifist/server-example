@@ -33,8 +33,8 @@ pub fn not_found() -> IronResult<Response> {
 	Ok(Response::with(Status::NotFound))
 }
 
-pub fn update_var(req: &mut Request, name: &str, val: Box<Value>) {
+pub fn update_var<T: Value>(req: &mut Request, name: &str, val: T) {
 	let ctx = req.extensions.get_mut::<ContextKey>()
 		.expect("Could not get context in views::utils::update_var");
-	ctx.set(name, val);
+	ctx.set(name, Box::new(val));
 }

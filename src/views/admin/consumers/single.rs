@@ -24,11 +24,11 @@ pub fn entry(req: &mut Request) -> IronResult<Response> {
 		volume_sum += p.volume;
 		money_sum += p.sum;
 	}
-	update_var(req, "consumer", Box::new(consumer)); 
-	update_var(req, "payments", Box::new(VolumePaymentList::new(payments))); 
-	update_var(req, "total_volume_sum", Box::new(volume_sum)); 
-	update_var(req, "total_money_sum", Box::new(money_sum)); 
-	update_var(req, "today", Box::new(chrono::Local::today())); 
+	update_var(req, "consumer", consumer); 
+	update_var(req, "payments", VolumePaymentList::new(payments)); 
+	update_var(req, "total_volume_sum", volume_sum); 
+	update_var(req, "total_money_sum", money_sum); 
+	update_var(req, "today", chrono::Local::today()); 
 	render_ok(req, "admin/consumers/single.htmt")
 }
 

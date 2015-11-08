@@ -19,7 +19,7 @@ pub fn append_entry(router: &mut Router) {
 	subrouter.add_route("/", self::list::all, false);
 	append_single_entry(&mut subrouter);
 	let entry = move |req: &mut Request| {
-		update_var(req, "admin_menu_consumers", Box::new(true));
+		update_var(req, "admin_menu_consumers", true);
 		subrouter.handle(req)
 	};
 	router.add_route("/consumers/", entry, true);

@@ -19,7 +19,7 @@ fn entry(req: &mut Request) -> IronResult<Response> {
     let mut is_forbidden = false;
 	if let Ok(url_query) = req.get_ref::<UrlEncodedQuery>() {
 		if let Ok(next_url) = parse_single_field(url_query.get("next"), "") {
-			next = Some(Box::new(next_url.to_string()));
+			next = Some(next_url.to_string());
 		}
 		match parse_single_field(url_query.get("reason"), "") {
 			Ok("forbidden") => is_forbidden = true,
@@ -30,7 +30,7 @@ fn entry(req: &mut Request) -> IronResult<Response> {
 		update_var(req, "next", n);
 	}
 	let res_status = if is_forbidden {
-		update_var(req, "is_forbidden", Box::new(true));
+		update_var(req, "is_forbidden", true);
 		status::Forbidden
 	} else {
 		status::Ok

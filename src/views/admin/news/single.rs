@@ -10,7 +10,7 @@ use super::forms::NewsForm;
 pub fn show(req: &mut Request) -> IronResult<Response> {
 	let news = req.extensions.remove::<SingleNewsHandler>()
 		.expect("Could not get news id in admin::news::singe::show_edit");
-	update_var(req, "news", Box::new(news));
+	update_var(req, "news", news);
 	render_ok(req, "admin/news/single.htmt")
 }
 

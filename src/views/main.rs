@@ -12,7 +12,7 @@ fn entry(req: &mut Request) -> IronResult<Response> {
 		.expect("Could not get connection pool in views::main::entry");
 	let connection = pool.get().expect("Could not get connection in views::main::entry");
 	let news = NewsList::new(News::ordered_by_date(&connection, 5));
-	update_var(req, "news", Box::new(news));
+	update_var(req, "news", news);
     render_ok(req, "main.htmt")
 }
 

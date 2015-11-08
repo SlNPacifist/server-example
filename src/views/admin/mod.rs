@@ -24,7 +24,7 @@ pub fn append_entry(router: &mut Router) {
 fn admin_handle<T: Handler>(req: &mut Request, next: &T) -> IronResult<Response> {
 	if let Ok(session) = req.get::<CurrentSession>() {
 		if session.user.role.is_admin() {
-			update_var(req, "in_admin", Box::new(true));
+			update_var(req, "in_admin", true);
 			return next.handle(req);
 		}
 	}

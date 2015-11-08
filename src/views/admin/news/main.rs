@@ -12,7 +12,7 @@ pub fn all_news(req: &mut Request) -> IronResult<Response> {
 			.expect("Could not get connection pool in admin::news::all_news")
 			.get().expect("Could not get connection in admin::news::all_news");
 		let news = News::ordered_by_date(&connection, 20);
-		update_var(req, "news", Box::new(NewsList::new(news))); 
+		update_var(req, "news", NewsList::new(news)); 
 	}
 	render_ok(req, "admin/news/list.htmt")
 }

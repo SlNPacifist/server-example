@@ -12,7 +12,7 @@ pub fn entry(req: &mut Request) -> IronResult<Response> {
 	let consumers = Consumer::ordered_by_last_payment(
 		&pool.get().expect("Could not get connection in views::admin::main::entry"));
     let tmp: ConsumerWithPaymentInfoList = consumers.into();
-    update_var(req, "consumers", Box::new(tmp));
-    update_var(req, "admin_menu_main", Box::new(true));
+    update_var(req, "consumers", tmp);
+    update_var(req, "admin_menu_main", true);
     render_ok(req, "admin/main.htmt")
 }

@@ -12,7 +12,7 @@ pub fn append_entry(router: &mut Router) {
 	subrouter.add_route("/add/", picker!(post => self::add::add_user), false);
 	subrouter.add_route("/", picker!(get => self::list::all), false);
 	let entry = move |req: &mut Request| {
-		update_var(req, "admin_menu_users", Box::new(true));
+		update_var(req, "admin_menu_users", true);
 		subrouter.handle(req)
 	};
 	router.add_route("/users/", entry, true);
