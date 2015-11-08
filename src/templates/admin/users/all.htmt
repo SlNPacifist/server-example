@@ -1,11 +1,12 @@
 {% extends "admin/base.htmt" %}
 
-{% block title %} - добавить пользователя{% endblock %}
+{% block title %} - админка - список пользователей сайта{% endblock %}
 
 {% block body %}
-    <form class="form-horizontal" action="add_user/" method="POST">
+	<h1>Админка - список пользователей сайта</h1>
+    <form class="form-horizontal" action="add/" method="POST">
     <fieldset>
-    	<legend>Добавить пользователя</legend>
+    	<legend>Добавить пользователя сайта</legend>
     	<div class="form-group">
   			<label class="control-label col-md-4" for="login_field">Логин</label>  
 			<div class="col-md-4">
@@ -32,7 +33,7 @@
 		    </div>
 		</div>
 		<div class="form-group">
-		  	<label class="col-md-4 control-label" for="consumer_id_field">Select Basic</label>
+		  	<label class="col-md-4 control-label" for="consumer_id_field">Соответствующий потребитель</label>
 		  	<div class="col-md-4">
 		    	<select id="consumer_id_field" name="consumer_id" class="form-control">
 		      		<option value="-1">Не является потребителем</option>
@@ -49,4 +50,17 @@
 		</div>
 	</fieldset>
     </form>
+
+    <table class="table">
+    	<tr>
+    		<th>Логин</th>
+    		<th>Соответствующий потребитель</th>
+    	</tr>
+    	{% for user in users %}
+    	<tr>
+    		<td>{{user.login}}</td>
+    		<td>{{user.consumer.address}}</td>
+    	</tr>
+    	{% endfor %}
+    </table>
 {% endblock %}

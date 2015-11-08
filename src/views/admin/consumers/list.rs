@@ -11,6 +11,6 @@ pub fn all(req: &mut Request) -> IronResult<Response> {
 		.expect("Could not get connection pool in views::admin::consumer::list::all")
 		.get().expect("Could not get connection in views::admin::consumer::list::all");
 	let consumers = Consumer::all(&connection);
-    update_var(req, "consumers", Box::new(ConsumerList::new(consumers)));
+    update_var(req, "consumers", Box::new(ConsumerList(consumers)));
     render_ok(req, "admin/consumers/all.htmt")
 }

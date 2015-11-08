@@ -1,26 +1,11 @@
 use std::io::{Result, Error, ErrorKind};
 use iron::prelude::*;
-use iron_mountrouter::Router;
 use persistent::Read;
 use models::{User, UserRole};
 use db::Database;
 use views::utils::*;
 use forms::*;
 
-
-pub fn append_entry(router: &mut Router) {
-	let mut subrouter = Router::new();
-	subrouter.add_route("/add/",
-		picker!(post => add_user,
-				get => entry),
-		false);
-	router.add_route("/user/", subrouter, true);
-}
-
-pub fn entry(req: &mut Request) -> IronResult<Response> {
-	update_var(req, "admin_menu_user", Box::new(true));
-    render_ok(req, "admin/add_user.htmt")
-}
 
 pub fn add_user(req: &mut Request) -> IronResult<Response> {
 	let loc = match AddUserForm::from_request(req) {
@@ -29,16 +14,16 @@ pub fn add_user(req: &mut Request) -> IronResult<Response> {
 				.expect("Could not get connection pool in views::admin::user::add_user")
 				.get().expect("Could not get connection in views::admin::user::add_user");
 			match User::create(&connection, form.login, form.password, form.role, form.consumer_id) {
-				Ok(_) => "/admin/user/add/?user_added",
+				Ok(_) => "/admin/users/?user_added",
 				Err(err) => {
 					println!("{:?}", err);
-					"/admin/user/add/?user_not_added"
+					"/admin/users/?user_not_added"
 				}
 			}
 		}
 		Err(err) => {
 			println!("{:?}", err);
-			"/admin/user/add/?user_not_added"
+			"/admin/users/?user_not_added"
 		}
 	};
 	redirect(loc.to_string())

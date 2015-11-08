@@ -54,8 +54,7 @@ impl Consumer {
 	}
 		
 	pub fn insert(c: &Connection, address: String) {
-		c.execute("INSERT INTO consumer (address) VALUES ($1)",
-			&[&address]
-		).expect("Could not execute query for Consumer::insert");
+		c.execute("INSERT INTO consumer (address) VALUES ($1)", &[&address])
+			.expect("Could not execute query for Consumer::insert");
 	}
 }

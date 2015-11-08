@@ -78,4 +78,16 @@ impl User {
         	.iter().next()
         	.map(row_to_user)
 	}
+	
+	pub fn all(c: &Connection) -> Vec<User> {
+		c.prepare(r#"
+				SELECT login, role, consumer_id
+				FROM "user"
+				ORDER BY login"#)
+			.expect("Could not prepare query for User::all")
+			.query(&[])
+			.expect("Could not execute query for User::all")
+			.iter().map(row_to_user)
+			.collect()
+	}
 }

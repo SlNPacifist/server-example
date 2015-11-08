@@ -1,6 +1,6 @@
 mod main;
 mod consumers;
-mod user;
+mod users;
 mod news;
 
 use iron::prelude::*;
@@ -15,7 +15,7 @@ pub fn append_entry(router: &mut Router) {
 	subrouter.add_route("/", picker!(get => self::main::entry), false);
 
 	consumers::append_entry(&mut subrouter);
-	user::append_entry(&mut subrouter);
+	users::append_entry(&mut subrouter);
 	news::append_entry(&mut subrouter);
 	
 	router.add_route("/admin/", move |req: &mut Request| admin_handle(req, &subrouter), true);

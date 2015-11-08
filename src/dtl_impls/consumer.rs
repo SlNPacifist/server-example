@@ -3,9 +3,7 @@ use chrono::NaiveDate;
 use models::Consumer;
 
 #[derive(Debug, Clone)]
-pub struct ConsumerList {
-	consumers: Vec<Consumer>
-}
+pub struct ConsumerList(pub Vec<Consumer>);
 
 #[derive(Debug, Clone)]
 pub struct ConsumerWithPaymentInfo {
@@ -51,13 +49,13 @@ impl ValueAsBool for Consumer {
 
 impl ValueAsString for ConsumerList {
     fn as_string(&self) -> String {
-        format!("Consumer list ({} elements total)", self.consumers.len())
+        format!("Consumer list ({} elements total)", self.0.len())
     }
 }
 
 impl ValueAsIterator for ConsumerList {
 	fn get_iterator<'a>(&'a self) -> Option<Box<Iterator<Item=&Value> + 'a>> {
-		Some(Box::new(self.consumers.iter().map(value_to_trait_object)))
+		Some(Box::new(self.0.iter().map(value_to_trait_object)))
 	} 
 }
 
@@ -69,15 +67,7 @@ impl ValueAsObject for ConsumerList {
 
 impl ValueAsBool for ConsumerList {
 	fn as_bool(&self) -> bool {
-		!self.consumers.is_empty()
-	}
-}
-
-impl ConsumerList {
-	pub fn new(v: Vec<Consumer>) -> ConsumerList {
-		ConsumerList {
-			consumers: v
-		}
+		!self.0.is_empty()
 	}
 }
 
