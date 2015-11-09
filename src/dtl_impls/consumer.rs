@@ -13,9 +13,7 @@ pub struct ConsumerWithPaymentInfo {
 }
 
 #[derive(Debug, Clone)]
-pub struct ConsumerWithPaymentInfoList {
-	consumers: Vec<ConsumerWithPaymentInfo>
-}
+pub struct ConsumerWithPaymentInfoList(pub Vec<ConsumerWithPaymentInfo>);
 
 
 impl ValueAsString for Consumer {
@@ -104,13 +102,13 @@ impl ValueAsBool for ConsumerWithPaymentInfo {
 
 impl ValueAsString for ConsumerWithPaymentInfoList {
     fn as_string(&self) -> String {
-        format!("Consumer with payment list ({} elements total)", self.consumers.len())
+        format!("Consumer with payment list ({} elements total)", self.0.len())
     }
 }
 
 impl ValueAsIterator for ConsumerWithPaymentInfoList {
 	fn get_iterator<'a>(&'a self) -> Option<Box<Iterator<Item=&Value> + 'a>> {
-		Some(Box::new(self.consumers.iter().map(value_to_trait_object)))
+		Some(Box::new(self.0.iter().map(value_to_trait_object)))
 	} 
 }
 
@@ -122,17 +120,17 @@ impl ValueAsObject for ConsumerWithPaymentInfoList {
 
 impl ValueAsBool for ConsumerWithPaymentInfoList {
 	fn as_bool(&self) -> bool {
-		!self.consumers.is_empty()
+		!self.0.is_empty()
 	}
 }
 
-impl From<Vec<(Consumer, f32, Option<NaiveDate>)>> for ConsumerWithPaymentInfoList {
-	fn from(v: Vec<(Consumer, f32, Option<NaiveDate>)>) -> ConsumerWithPaymentInfoList {
-		ConsumerWithPaymentInfoList {
-			consumers: v.into_iter().map(|d| {
+impl ConsumerWithPaymentInfoList {
+	pub fn new(v: Vec<(Consumer, f32, Option<NaiveDate>)>) -> ConsumerWithPaymentInfoList {
+		ConsumerWithPaymentInfoList (
+			v.into_iter().map(|d| {
 				let (a, b, c) = d;
 				ConsumerWithPaymentInfo{ consumer: a, total_volume: b, last_payment_date: c }
 			}).collect()
-		}
+		)
 	}
 }

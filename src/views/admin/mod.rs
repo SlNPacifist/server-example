@@ -1,4 +1,3 @@
-mod main;
 mod consumers;
 mod users;
 mod news;
@@ -12,7 +11,6 @@ use views::utils::*;
 
 pub fn append_entry(router: &mut Router) {
 	let mut subrouter = Router::new();
-	subrouter.add_route("/", picker!(get => self::main::entry), false);
 
 	consumers::append_entry(&mut subrouter);
 	users::append_entry(&mut subrouter);

@@ -21,7 +21,7 @@ impl Consumer {
         	.map(|row| Consumer { id: id, address: row.get(0) })
 	}
 	
-	pub fn ordered_by_last_payment(c: &Connection) -> Vec<(Consumer, f32, Option<NaiveDate>)> {
+	pub fn with_last_payment(c: &Connection) -> Vec<(Consumer, f32, Option<NaiveDate>)> {
 		c.prepare("
 				SELECT
 					c.id, c.address,
@@ -30,7 +30,7 @@ impl Consumer {
 				FROM consumer c
 				LEFT JOIN volume_payment vp ON (c.id = vp.consumer_id)
 				GROUP BY c.id
-				ORDER BY last_payment_date NULLS FIRST, c.address")
+				ORDER BY c.address")
 			.expect("Could not prepare query for Consumer::ordered_by_last_payment")
 			.query(&[])
 			.expect("Could not execute query for Consumer::ordered_by_last_payment")

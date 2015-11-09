@@ -4,6 +4,23 @@
 
 {% block body %}
 	<h1>Админка - список потребителей</h1>
+	<div id="street-filter-container"></div>
+    <table class="table">
+    	<thead><tr>
+    		<th>Адрес</th>
+    		<th>Оплаченный объем</th>
+    		<th>Дата последней оплаты</th>
+    		<th>Действия</th>
+    	</tr></thead>
+    	{% for cwp in consumers %}
+    	<tr>
+    		<td><a href="/admin/consumer/{{cwp.consumer.id}}/">{{cwp.consumer.address}}</a></td>
+    		<td>{{cwp.total_volume}}</td>
+    		<td>{{cwp.last_payment_date|default:Не было ни одной оплаты}}</td>
+    		<td><a href="/admin/consumer/{{cwp.consumer.id}}/#add-payment-form">Добавить оплату</a></td>
+    	</tr>
+    	{% endfor %}
+    </table>
     <form class="form-horizontal" action="/admin/consumers/add/" method="POST">
     <fieldset>
     	<legend>Добавить потребителя</legend>
@@ -20,17 +37,8 @@
 		</div>
 	</fieldset>
     </form>
-    
-    <table class="table">
-    	<tr>
-    		<th>Адрес</th>
-    		<th>Действия</th>
-    	</tr>
-    	{% for consumer in consumers %}
-    	<tr>
-    		<td><a href="/admin/consumers/{{consumer.id}}/">{{consumer.address}}</a></td>
-    		<td><a href="/admin/consumers/{{consumer.id}}/#add-payment-form">Добавить оплату</a></td>
-    	</tr>
-    	{% endfor %}
-    </table>
+{% endblock %}
+
+{% block javascript %}
+	<script src="/s/js/consumer-table-manager.js"></script>
 {% endblock %}
