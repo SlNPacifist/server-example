@@ -3,15 +3,17 @@
 {% block title %} - админка - главная страница{% endblock %}
 
 {% block body %}
-	<h1>Админка - главная странца</h1>
+	<h1>Админка - главная страница</h1>
 	<h3>Список потребителей, отсортированный по дате последней оплаты</h3>
+	<div id="street-filter-container"></div>
     <table class="table">
-    	<tr>
-    		<th>Адрес</th>
+    	<thead><tr>
+    		<th class=".js-table-filter-address">Адрес</th>
     		<th>Оплаченный объем</th>
     		<th>Дата последней оплаты</th>
     		<th></th>
-    	</tr>
+    	</tr></thead>
+    	
     	{% for cwp in consumers %}
     	<tr>
     		<td><a href="/admin/consumer/{{cwp.consumer.id}}/">{{cwp.consumer.address}}</a></td>
@@ -21,4 +23,8 @@
     	</tr>
     	{% endfor %}
     </table>
+{% endblock %}
+
+{% block javascript %}
+	<script src="/s/js/table-manager.js"></script>
 {% endblock %}
