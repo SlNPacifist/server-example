@@ -30,7 +30,7 @@ impl Consumer {
 				FROM consumer c
 				LEFT JOIN volume_payment vp ON (c.id = vp.consumer_id)
 				GROUP BY c.id
-				ORDER BY last_payment_date NULLS FIRST")
+				ORDER BY last_payment_date NULLS FIRST, c.address")
 			.expect("Could not prepare query for Consumer::ordered_by_last_payment")
 			.query(&[])
 			.expect("Could not execute query for Consumer::ordered_by_last_payment")
@@ -45,7 +45,7 @@ impl Consumer {
 		c.prepare("
 				SELECT id, address
 				FROM consumer c
-				ORDER BY id")
+				ORDER BY address")
 			.expect("Could not prepare query for Consumer::all")
 			.query(&[])
 			.expect("Could not execute query for Consumer::all")
