@@ -9,7 +9,7 @@ $(document).ready(function() {
 		.join(' ');
 	var sorted_columns = [
 		{selector: 'table th:first-child', key: get_street_sort_key},
-		{selector: 'table th:nth-child(3)', key: get_street_text},
+		{selector: 'table th:nth-child(3)', key: get_date_sort_key},
 	];
 	
 	function get_street_text($row) {
@@ -63,11 +63,16 @@ $(document).ready(function() {
 	}
 	
 	function get_street_sort_key($row) {
-		var res = get_street_text($row).split(/[.|,]/);
-		if (2 in res) {
-			res[2] = parseInt(res[2]);
-		}
-		return res;
+		return get_street_text($row).split(/[.|,]/).slice(1).map(function(val) {
+			return val.trim();
+		});
+	}
+	
+	function get_date_sort_key($row) {
+		var text = get_date_text($row);
+		var m = text.match(/(\d{4})-(\d{2})-(\d{2})/);
+		if (m) return m.slice(1);
+		return ["0", get_street_text($row)];
 	}
 	
 	function apply_sort_order($rows) {
@@ -76,16 +81,30 @@ $(document).ready(function() {
 		});
 	}
 	
+	function compare_arrays(a, b) {
+		var l = Math.min(a.length, b.length);
+		for (var i = 0; i < l; i++) {
+			var diff = a[i] - b[i];
+			if (!isNaN(diff) && diff != 0) return diff;
+			if (a[i] < b[i]) {
+				return -1;
+			} else if (a[i] > b[i]) {
+				return 1;
+			}
+		}
+		if (a.length < b.length) {
+			return -1;
+		} else if (a.length > b.length) {
+			return 1;
+		}
+		return 0;
+	}
+	
 	function sort_by($rows, key, is_desc) {
 		$rows.sort(function(a, b) {
 			key_a = key($(a));
 			key_b = key($(b));
-			res = 0;
-			if (key_a < key_b) {
-				res = -1
-			} else if (key_a > key_b) {
-				 res = 1;
-			}
+			var res = compare_arrays(key_a, key_b);
 			if (is_desc) res = -res;
 			return res;
 		});
