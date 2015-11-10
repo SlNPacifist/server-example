@@ -14,10 +14,10 @@
     	</tr></thead>
     	{% for cwp in consumers %}
     	<tr>
-    		<td><a href="/admin/consumer/{{cwp.consumer.id}}/">{{cwp.consumer.address}}</a></td>
+    		<td><a href="/admin/consumers/{{cwp.consumer.id}}/">{{cwp.consumer.address}}</a></td>
     		<td>{{cwp.total_volume}}</td>
     		<td>{{cwp.last_payment_date|default:Не было ни одной оплаты}}</td>
-    		<td><a href="/admin/consumer/{{cwp.consumer.id}}/#add-payment-form">Добавить оплату</a></td>
+    		<td><a href="/admin/consumers/{{cwp.consumer.id}}/#add-payment-form">Добавить оплату</a></td>
     	</tr>
     	{% endfor %}
     </table>
