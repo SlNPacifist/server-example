@@ -43,27 +43,15 @@ pub struct SingleNewsHandler(Box<Handler>);
 
 impl SingleNewsHandler {
 	fn get_news(req: &mut Request) -> Option<News> {
-		let id_opt;
-		{
-			let ref params = req.extensions.get::<Router>()
-				.expect("Could not get router params in NewsHandler::get_news");
-			id_opt = match i32::from_str(params.get("news-id")
-				.expect("Could not get id param in NewsHandler::get_news")) {
-					
-				Ok(consumer_id) => Some(consumer_id),
-				Err(_) => None
-			};
-		}
-		match id_opt {
-			Some(id) => { 
-				let pool = req.get::<Read<Database>>()
-					.expect("Could not get connection pool in ConsumerHandler::get_consumer");
-				let connection = pool.get()
-					.expect("Could not get connection in ConsumerHandler::get_consumer");
+		req.extensions.get::<Router>()
+			.and_then(|params| params.get("id"))
+			.and_then(|id| i32::from_str(id).ok())
+			.and_then(|id| {
+				let connection = req.get::<Read<Database>>()
+					.expect("Could not get connection pool in SingleNewsHandler::get_news")
+					.get().expect("Could not get connection in SingleNewsHandler::get_news");
 				News::by_id(&connection, id)
-			},
-			None => None
-		}
+			})
 	}
 }
 

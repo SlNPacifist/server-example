@@ -38,27 +38,15 @@ struct ConsumerHandler(Box<Handler>);
 
 impl ConsumerHandler {
 	fn get_consumer(req: &mut Request) -> Option<Consumer> {
-		let id_opt;
-		{
-			let ref params = req.extensions.get::<Router>()
-				.expect("Could not get router params in ConsumerHandler::get_consumer");
-			id_opt = match i32::from_str(params.get("id")
-				.expect("Could not get id param in ConsumerHandler::get_consumer")) {
-					
-				Ok(consumer_id) => Some(consumer_id),
-				Err(_) => None
-			};
-		}
-		match id_opt {
-			Some(id) => { 
-				let pool = req.get::<Read<Database>>()
-					.expect("Could not get connection pool in ConsumerHandler::get_consumer");
-				let connection = pool.get()
-					.expect("Could not get connection in ConsumerHandler::get_consumer");
+		req.extensions.get::<Router>()
+			.and_then(|params| params.get("id"))
+			.and_then(|id| i32::from_str(id).ok())
+			.and_then(|id| {
+				let connection = req.get::<Read<Database>>()
+					.expect("Could not get connection pool in ConsumerHandler::get_consumer")
+					.get().expect("Could not get connection in ConsumerHandler::get_consumer");
 				Consumer::by_id(&connection, id)
-			},
-			None => None
-		}
+			})
 	}
 }
 
