@@ -1,0 +1,59 @@
+body {
+	width: 70mm;
+	height: 120mm;
+	border: 1px solid #E0E0E0;
+	padding: 5mm;
+}
+
+.header {
+	text-align: center;
+	margin: 0px;
+}
+
+hr {
+	margin: 0 5mm;
+}
+
+.header.name {
+	font-size: 4mm;
+}
+
+.header.name.sub {
+	font-size: 3mm;
+}
+
+.title {
+	font-size: 6mm;
+	margin: 15mm 0 10mm 0;
+	font-weight: bold;
+}
+
+.text-line {
+	font-size: 3.5mm;
+}
+
+.text-line .handwritten {
+	font-size: 4.5mm;
+}
+
+.text-line .handwritten:not(.no-underline) {
+	text-decoration: underline;
+}
+
+.text-line.help {
+	border-top: 1px solid black;
+	text-align: center;
+}
+
+.stamp {
+	margin-top: 15mm;
+	margin-bottom: 10mm;
+}
+
+.cashier_underline {
+	display: inline-block;
+	border-bottom: 1px solid black;
+	width: 16mm;
+	margin-left: 10mm;
+	margin-right: 3mm;
+}

@@ -3,6 +3,7 @@ mod main;
 mod admin;
 mod login;
 mod static_files;
+mod filters;
 
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -14,6 +15,7 @@ use persistent::{Read, State};
 use iron_mountrouter::Router;
 use db::{DbConnectionPool, Database};
 use session::MemorySessionStorage;
+use self::filters::*;
 
 pub struct TemplateCompilerKey;
 impl Key for TemplateCompilerKey { type Value = Arc<TemplateCompiler>; }
@@ -60,8 +62,9 @@ pub fn get_root(pool: DbConnectionPool) -> Chain {
 	static_files::append_entry(&mut router);
     let mut root = PathBuf::new();
     root.push("./src/templates");
-    let template_compiler = TemplateCompiler::new(root)
+    let mut template_compiler = TemplateCompiler::new(root)
     	.expect("Could not create template compiler in view::get_root");
+	template_compiler.add_filter("handwritten".to_string(), handwritten_sum);
     let template_compiler_preprocessor = TemplateCompilerPreprocessor::new(template_compiler);
     let session_storage = MemorySessionStorage::new();
 	let mut chain = Chain::new(router);

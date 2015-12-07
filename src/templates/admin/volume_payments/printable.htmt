@@ -1,0 +1,31 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="ТСЖ Старая Зима">
+    <meta name="author" content="Вячеслав Бажинов">
+    <link rel="icon" href="/s/favicon.ico">
+    <link rel="stylesheet" href="/s/css/printable.css">
+
+    <title>ТСЖ "Старая Зима". Квитанция за оплату №{{ payment.id }}</title>
+    <style type="text/css">
+    </style>
+  </head>
+
+  <body>
+  	<div class="header name">ТСЖ "Старая Зима"</div>
+  	
+  	<div class="header title">КВИТАНЦИЯ</div>
+  	<div class="text-line">от <span class="handwritten">{{payment.payment_date|chrono_format:%d.%m.%Y}} г.</span></div> 
+  	<div class="text-line">Принято от <span class="handwritten">{{consumer.address}}</span></div> 
+  	<div class="text-line">Основание: <span class="handwritten">{{payment.volume}} куб. м.</span></div>
+  	<div class="text-line">Всего оплачено: <span class="handwritten">{{total_volume}} куб. м.</span></div>
+  	<div class="text-line">Сумма: <span class="handwritten">{{payment.sum}} рублей<span></div>
+  	<div class="text-line"><span class="handwritten no-underline">{{payment.sum|handwritten}} рублей</span></div>
+  	<div class="text-line help"><sup>(сумма прописью)<sup></div>
+  	<div class="stamp">М.П.</div>
+  	<div class="text-line">Кассир <span class="cashier_underline"></span> Бажинова Т.П.</div>
+  </body>
+</html>

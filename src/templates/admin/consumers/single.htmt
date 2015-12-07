@@ -16,7 +16,7 @@
 			<tbody>
 			{% for payment in payments %}
 				<tr>
-		        	<td>{{ payment.payment_date|chrono_format:%d.%m.%Y }}</td>
+		        	<td><a href="/admin/volume_payments/{{ payment.id }}/printable/" title="Квитанция">{{ payment.payment_date|chrono_format:%d.%m.%Y }}</a></td>
 		        	<td>{{ payment.volume }} м<sup>3</sup></td>
 		        	<td>{{ payment.sum }} руб</td>
 		        </tr>
