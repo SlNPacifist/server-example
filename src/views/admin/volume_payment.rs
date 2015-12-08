@@ -17,11 +17,11 @@ pub fn printable(req: &mut Request) -> IronResult<Response> {
 		.and_then(|id| VolumePayment::by_id(&connection, id));
 	match volume_payment_opt {
 		Some(vp) => {
-			let mut sum = 0.0;
+			let mut total_volume = 0.0;
 			for payment in VolumePayment::up_to_date(&connection, vp.consumer_id, vp.payment_date) {
-				sum += payment.sum;
+				total_volume += payment.volume;
 			}
-			update_var(req, "total_volume", sum);
+			update_var(req, "total_volume", total_volume);
 			update_var(req, "consumer", Consumer::by_id(&connection, vp.consumer_id).unwrap());
 			update_var(req, "payment", vp);
 			render_ok(req, "admin/volume_payments/printable.htmt")
