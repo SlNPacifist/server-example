@@ -63,9 +63,17 @@ $(document).ready(function() {
 	}
 	
 	function get_street_sort_key($row) {
-		return get_street_text($row).split(/[.|,]/).slice(1).map(function(val) {
+		var res = get_street_text($row).split(/[.|,]/).slice(1).map(function(val) {
 			return val.trim();
 		});
+		var full_house_num = res[res.length - 1];
+		var house_num = parseInt(full_house_num);
+		if ((house_num + '').length < full_house_num.length) {
+			res[res.length - 1] = house_num;
+			var leftover = full_house_num.slice((house_num + '').length).replace(/^\-/gm, '');
+			res.push(leftover);
+		}
+		return res;
 	}
 	
 	function get_date_sort_key($row) {
@@ -132,6 +140,14 @@ $(document).ready(function() {
 		});
 	}
 	
+	function revert_sort_order(column, $rows) {
+		var state = (column.state == 'asc') ? 'desc' : 'asc';
+		drop_all_sort_states();
+		sort_by($rows, column.key, state == 'desc');
+		apply_sort_order($rows);
+		update_column_state(column, state);
+	}
+	
 	function create_column_sort_button(column, $rows) {
 		column.$switcher = $('<span class="glyphicon">');
 		update_column_state(column, 'non-sorted');
@@ -139,11 +155,7 @@ $(document).ready(function() {
 		$header.append(column.$switcher);
 		$header.wrapInner('<button type="button" class="btn btn-default"></button>');
 		function rev_sort() {
-			var state = (column.state == 'asc') ? 'desc' : 'asc';
-			drop_all_sort_states();
-			sort_by($rows, column.key, state == 'desc');
-			apply_sort_order($rows);
-			update_column_state(column, state);
+			revert_sort_order(column, $rows);
 		}
 		$($header[0].childNodes[0]).click(rev_sort);
 	}
@@ -153,4 +165,5 @@ $(document).ready(function() {
 	$(sorted_columns).each(function() {
 		create_column_sort_button(this, $rows)
 	});
+	revert_sort_order(sorted_columns[0], $rows);
 });
