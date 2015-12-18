@@ -50,7 +50,9 @@ pub fn login_user(req: &mut Request) -> IronResult<Response> {
 					{
 						let jar = req.get_mut::<or::CookieJar>()
 							.expect("Could not get cookie storage in views::login::login_user");
-						jar.add(or::Cookie::new("session-id".into(), session.id.clone().into()));
+						let mut cookie = or::Cookie::new("session-id".into(), session.id.clone().into());
+						cookie.path = Some("/".to_string());
+						jar.add(cookie);
 					}
 					{
 						let arc_session_storage = req.get::<State<SessionStorageKey>>()
