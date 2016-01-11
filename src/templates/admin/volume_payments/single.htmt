@@ -1,0 +1,34 @@
+{% extends "admin/base.htmt" %}
+
+{% block title %} - редактирование оплаты{% endblock %}
+
+{% block body %}
+    <form class="form-horizontal" action="" id="add-payment-form" method="POST">
+    <fieldset>
+    	<legend>Изменить платеж</legend>
+    	<div class="form-group">
+  			<label class="control-label col-md-4" for="volume_field">Объем</label>  
+			<div class="col-md-4">
+		    	<input id="volume_field" name="volume" type="text" class="form-control input-md" value="{{payment.volume}}">
+		    </div>
+		</div>
+    	<div class="form-group">
+  			<label class="col-md-4 control-label" for="payment_sum_field">Сумма</label>  
+			<div class="col-md-4">
+		    	<input id="payment_sum_field" name="payment_sum" type="text" class="form-control input-md" value="{{payment.sum}}">
+		    </div>
+		</div>
+    	<div class="form-group">
+  			<label class="col-md-4 control-label" for="payment_date_field">Дата</label>  
+			<div class="col-md-4">
+		    	<input id="payment_date_field" name="payment_date" type="date" value="{{payment.payment_date|chrono_format:%Y-%m-%d}}" class="form-control input-md">
+		    </div>
+		</div>
+		<div class="form-group">
+		  	<div class="col-md-4">
+		  		<input type="submit" value="Сохранить платеж" class="btn btn-primary">
+		  	</div>
+		</div>
+	</fieldset>
+    </form>
+{% endblock %}

@@ -41,6 +41,14 @@ impl VolumePayment {
 			&[&volume, &consumer_id, &payment_date, &sum]
 		).expect("Could not execute query for VolumePayment::insert");
 	}
+
+	pub fn update(c: &Connection, id: i32, volume: f32, payment_date: NaiveDate, sum: f32) {
+		c.execute("
+			UPDATE volume_payment SET volume=$1, payment_date=$2, sum=$3
+			WHERE id=$4",
+			&[&volume, &payment_date, &sum, &id]
+		).expect("Could not execute query for VolumePayment::insert");
+	}
 	
 	pub fn by_id(c: &Connection, id: i32) -> Option<VolumePayment> {
         c.prepare("

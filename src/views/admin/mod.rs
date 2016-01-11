@@ -1,7 +1,7 @@
 mod consumers;
 mod users;
 mod news;
-mod volume_payment;
+mod volume_payments;
 
 use iron::prelude::*;
 use iron::middleware::Handler;
@@ -16,8 +16,8 @@ pub fn append_entry(router: &mut Router) {
 	consumers::append_entry(&mut subrouter);
 	users::append_entry(&mut subrouter);
 	news::append_entry(&mut subrouter);
+	volume_payments::append_entry(&mut subrouter);
 	
-	subrouter.add_route("/volume_payments/:vp-id/printable/", volume_payment::printable, false);
 	router.add_route("/admin/", move |req: &mut Request| admin_handle(req, &subrouter), true);
 }
 
