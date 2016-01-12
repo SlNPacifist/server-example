@@ -1,5 +1,4 @@
 mod single;
-mod add;
 mod list;
 
 use std::str::FromStr;
@@ -16,7 +15,7 @@ use views::admin::volume_payments::single::add as add_volume_payment;
 
 pub fn append_entry(router: &mut Router) {
 	let mut subrouter = Router::new();
-	subrouter.add_route("/add/", self::add::add_consumer, false);
+	subrouter.add_route("/add/", self::single::add_consumer, false);
 	subrouter.add_route("/", self::list::all, false);
 	append_single_entry(&mut subrouter);
 	let entry = move |req: &mut Request| {
@@ -30,6 +29,7 @@ fn append_single_entry(router: &mut Router) {
 	let mut subrouter = Router::new();
 	subrouter.add_route("/", picker!(get => self::single::entry), false);
 	subrouter.add_route("/add_payment/", picker!(post => add_volume_payment), false);
+	subrouter.add_route("/update_info/", picker!(post => self::single::update_consumer), false);
 
 	let preprocessor = ConsumerHandler(Box::new(subrouter));
 	router.add_route("/:id/", preprocessor, true);

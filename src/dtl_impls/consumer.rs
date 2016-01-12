@@ -33,6 +33,8 @@ impl ValueAsObject for Consumer {
 		match name {
 			"id" => Some(&self.id),
 			"address" => Some(&self.address),
+			"name" => Some(&self.name),
+			"phone" => Some(&self.phone),
 			_ => None
 		}
 	}
