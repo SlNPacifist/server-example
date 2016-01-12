@@ -3,4 +3,6 @@
 /.project
 /config.toml
 /.settings/
+/.idea/
+/shop.iml
 *~
