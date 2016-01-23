@@ -24,6 +24,7 @@ mod dtl_impls;
 mod forms;
 mod session;
 mod config;
+mod sms_daemon;
 
 use std::path::Path;
 use clap::{App, SubCommand};
@@ -43,6 +44,8 @@ fn main() {
         	.about("adds new admin")
         	.args_from_usage("<name> 'Username for created admin'
         					  <password> 'Password for created admin'"))
+        .subcommand(SubCommand::with_name("start-sms-daemon"))
+            .about("Starts daemon for sending sms")
         .subcommand_required(true)
         .get_matches();
     if matches.subcommand_matches("start").is_some() {
@@ -53,6 +56,8 @@ fn main() {
     	let password = sub_matches.value_of("password")
     		.expect("Could not get _password_ param from command line");
     	add_admin(pool, name, password);
+    } else if matches.subcommand_matches("start-sms-daemon").is_some() {
+        start_sms_daemon(config, pool);
     }
 }
 
@@ -68,4 +73,9 @@ fn add_admin(pool: DbConnectionPool, name: &str, password: &str) {
 	User::create(&connection, name.to_string(), password.to_string(), UserRole::Admin, None)
 		.expect("Could not add admin");
 	println!("Admin {} added", name);
+}
+
+fn start_sms_daemon(config: Config, pool: DbConnectionPool) {
+    sms_daemon::start_sms_daemon();
+	println!("Sms daemon started");
 }
